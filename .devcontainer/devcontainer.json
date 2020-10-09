@@ -1,5 +1,5 @@
 {
-	"name": "Ansible corey dev",
+	"name": "Arista corey dev",
 	"context": "..",
 	"dockerFile": "Dockerfile",
 	"settings": { 
