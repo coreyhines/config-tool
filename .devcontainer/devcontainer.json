@@ -20,7 +20,7 @@
 		"esbenp.prettier-vscode",
 		"wolfmah.ansible-vault-inline"
 	],
-	"postCreateCommand": "cd /tmp; wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && sh install.sh --unattended && if [ -d ~/dotfiles ]; then rm ~/.zshrc; /usr/local/bin/dotbot -c ~/dotfiles/install.conf.yaml; fi && cd /; cp ~/config-tool/.devcontainer/resolv.conf /etc/resolv.conf",
+	"postCreateCommand": "cd /tmp; wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && sh install.sh --unattended && if [ -d ~/dotfiles ]; then rm ~/.zshrc; /usr/local/bin/dotbot -c ~/dotfiles/install.conf.yaml; fi && cd /; cp ~/config-tool/.devcontainer/resolv.conf /etc/resolv.conf; mkdir ~/vs-code; ln -s /workspaces/config-tool ~/vs-code/config-tool",
 	"mounts": [ 
 		"source=${localEnv:HOME}/.ssh,target=/home/arista-dev/.ssh,type=bind,consistency=cached",
 	],
