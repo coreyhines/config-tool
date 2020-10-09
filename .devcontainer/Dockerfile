@@ -13,7 +13,7 @@ RUN apt update && apt install -y sudo \
                                  liquidprompt
 RUN apt -y dist-upgrade
 
-ARG USERNAME=corey-dev
+ARG USERNAME=arista-dev
 ARG USER_UID=1002
 ARG USER_GID=$USER_UID
 
