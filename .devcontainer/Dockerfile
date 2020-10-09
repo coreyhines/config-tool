@@ -28,6 +28,6 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 RUN pip install --upgrade pip
-RUN pip install dotbot linode_api4 rcvpapi ruamel.yaml Pyyaml lxml jsonrpclib ansible cvprac pyeapi pylint tornado apscheduler pymongo
+RUN pip install dotbot linode_api4 rcvpapi ruamel.yaml Pyyaml lxml jsonrpclib cvprac pyeapi pylint apscheduler
 
 USER $USERNAME
