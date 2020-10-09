@@ -79,7 +79,7 @@ dupes = get_dupes(stanzas)
 #print(len(dupes))
 
 # printing is ok for now but should save to a file or ask.
-# it is also nice to jsut redirect the output to a file user's choice
+# it is also nice to just redirect the output to a file user's choice
 print("\n".join(dupes))
 
 # once the comments gathering code is fixed, this should be useful
