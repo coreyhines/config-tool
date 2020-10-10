@@ -61,14 +61,25 @@ def get_dupes(L):
     return list(seen2)
 
 
+def search_comments(line):
+  regex_match = re.compile(r'^\s*\!\!.*', re.M)
+  re_match = re.findall(regex_match, line)
+  return list(re_match)
+
+
+regex_sub = re.compile(r'^\s*!!.*', re.M)
+
 stanzas = []
 comments = []
+poo = []
 for path in pathlib.Path(mydir).iterdir():
     if path.is_file():
         current_file = open(path, "r")
         content = current_file.read()
         # this is broken, need to import re and filter comments another way
-        comments += content.split('!!')
+        comments = search_comments(content)
+        sub = re.sub(regex_sub, "", content)
+        poo += content.split('!!')
         stanzas += content.split('!')
         current_file.close()
 
@@ -83,5 +94,5 @@ dupes = get_dupes(stanzas)
 print("\n".join(dupes))
 
 # once the comments gathering code is fixed, this should be useful
-#print("##################### COMMENTS #######################")
-#print("\n".join(comments))
+print("##################### COMMENTS #######################")
+print("\n".join(comments))
