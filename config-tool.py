@@ -39,7 +39,6 @@ an attempt to recover EOS configuration stanzas that are common amongst a corpus
 
 import pathlib
 import collections
-# to be used in the next revision
 import re
 
 from os.path import expanduser
@@ -76,11 +75,9 @@ for path in pathlib.Path(mydir).iterdir():
     if path.is_file():
         current_file = open(path, "r")
         content = current_file.read()
-        # this is broken, need to import re and filter comments another way
         comments = search_comments(content)
-        sub = re.sub(regex_sub, "", content)
-        poo += content.split('!!')
-        stanzas += content.split('!')
+        subcontent = re.sub(regex_sub, "", content)
+        stanzas += subcontent.split('!')
         current_file.close()
 
 ## these print statements are for debugging/testing
@@ -89,10 +86,15 @@ print(len(comments))
 dupes = get_dupes(stanzas)
 #print(len(dupes))
 
-# printing is ok for now but should save to a file or ask.
-# it is also nice to just redirect the output to a file user's choice
+# Better print formatting can be added
+# Statistics could be added to show how many times
+# a stanza is found. This would be useful for scoring, more times seen
+# equals more likelihood the stanza is a universal 'configlet'
+# additional logic could be applied to wrestle the output into better order during printing
+# EXAMPLE: Some aaa commands may not appear together, test for similar occurrences
+print("##################### STANZAS per '!' found 2 or more times #################")
 print("\n".join(dupes))
 
-# once the comments gathering code is fixed, this should be useful
-print("##################### COMMENTS #######################")
+# Coments list for review
+print("##################### COMMENTS  '!!' found in corpus #######################")
 print("\n".join(comments))
