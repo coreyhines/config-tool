@@ -38,7 +38,7 @@ an attempt to recover EOS configuration stanzas that are common amongst a corpus
 """
 
 import pathlib
-import collections
+#import collections
 import re
 
 from os.path import expanduser
@@ -70,7 +70,6 @@ regex_sub = re.compile(r'^\s*!!.*', re.M)
 
 stanzas = []
 comments = []
-poo = []
 for path in pathlib.Path(mydir).iterdir():
     if path.is_file():
         current_file = open(path, "r")
