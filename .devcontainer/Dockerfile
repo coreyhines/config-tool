@@ -1,16 +1,11 @@
 FROM python:3.8.5
 
 RUN apt update && apt install -y sudo \
-                                 vim \
-                                 git \
-                                 zip \
-                                 cloc \
-                                 lastpass-cli \
-                                 dnsutils \
-                                 zsh \
-                                 zsh-syntax-highlighting \
-                                 zsh-doc \
-                                 liquidprompt
+    vim git zip \
+    cloc lastpass-cli dnsutils \
+    zsh zsh-syntax-highlighting zsh-doc \
+    less liquidprompt
+
 RUN apt -y dist-upgrade
 
 ARG USERNAME=arista-dev
