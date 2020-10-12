@@ -92,7 +92,7 @@ for path in pathlib.Path(mydir).iterdir():
 # print(len(comments))
 
 dupes = get_dupes(stanzas)
-comments = get_dupes(comments)
+comments = set(comments)
 # print(len(dupes))
 
 # Better print formatting can be added
