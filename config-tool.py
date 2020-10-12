@@ -78,7 +78,7 @@ for path in pathlib.Path(mydir).iterdir():
     if path.is_file():
         current_file = open(path, "r")
         content = current_file.read()
-        comments = search_comments(content)
+        comments += search_comments(content)
         subcontent = re.sub(regex_sub, "", content)
         subcontent = re.sub(regex_sub2, "", subcontent)
         subcontent = re.sub(regex_sub3, "", subcontent)
@@ -92,6 +92,7 @@ for path in pathlib.Path(mydir).iterdir():
 # print(len(comments))
 
 dupes = get_dupes(stanzas)
+comments = get_dupes(comments)
 # print(len(dupes))
 
 # Better print formatting can be added
