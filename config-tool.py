@@ -61,7 +61,7 @@ def get_dupes(L):
 
 
 def search_comments(line):
-    regex_match = re.compile(r'^\s*\!\!.*', re.M)
+    regex_match = re.compile(r'^\s*!!.*', re.M)
     re_match = re.findall(regex_match, line)
     return list(re_match)
 
@@ -70,10 +70,10 @@ regex_sub = re.compile(r'^\s*!!.*', re.M)
 regex_sub2 = re.compile(r'^>.*', re.M)
 regex_sub3 = re.compile(r'^\s.*Command:.*', re.M)
 regex_sub4 = re.compile(r'^!.*boot\ssystem.*', re.M)
-regex_blanks = re.compile(r'\n\s*\n', re.MULTILINE)
 
 stanzas = []
 comments = []
+
 for path in pathlib.Path(mydir).iterdir():
     if path.is_file():
         current_file = open(path, "r")
@@ -83,7 +83,6 @@ for path in pathlib.Path(mydir).iterdir():
         subcontent = re.sub(regex_sub2, "", subcontent)
         subcontent = re.sub(regex_sub3, "", subcontent)
         subcontent = re.sub(regex_sub4, "", subcontent)
-        subcontent = re.sub(regex_blanks, "", subcontent)
 
         stanzas += subcontent.split('!')
         current_file.close()
