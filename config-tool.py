@@ -38,7 +38,7 @@ an attempt to recover EOS configuration stanzas that are common amongst a corpus
 """
 
 import pathlib
-#import collections
+from collections import Counter
 import re
 
 from os.path import expanduser
@@ -54,19 +54,23 @@ def get_dupes(L):
     seen2_add = seen2.add
     for item in L:
         if item in seen:
-          seen2_add(item)
+            seen2_add(item)
         else:
-          seen_add(item)
+            seen_add(item)
     return list(seen2)
 
 
 def search_comments(line):
-  regex_match = re.compile(r'^\s*\!\!.*', re.M)
-  re_match = re.findall(regex_match, line)
-  return list(re_match)
+    regex_match = re.compile(r'^\s*\!\!.*', re.M)
+    re_match = re.findall(regex_match, line)
+    return list(re_match)
 
 
 regex_sub = re.compile(r'^\s*!!.*', re.M)
+regex_sub2 = re.compile(r'^>.*', re.M)
+regex_sub3 = re.compile(r'^\s.*Command:.*', re.M)
+regex_sub4 = re.compile(r'^!.*boot\ssystem.*', re.M)
+regex_blanks = re.compile(r'\n\s*\n', re.MULTILINE)
 
 stanzas = []
 comments = []
@@ -76,14 +80,20 @@ for path in pathlib.Path(mydir).iterdir():
         content = current_file.read()
         comments = search_comments(content)
         subcontent = re.sub(regex_sub, "", content)
+        subcontent = re.sub(regex_sub2, "", subcontent)
+        subcontent = re.sub(regex_sub3, "", subcontent)
+        subcontent = re.sub(regex_sub4, "", subcontent)
+        subcontent = re.sub(regex_blanks, "", subcontent)
+
         stanzas += subcontent.split('!')
         current_file.close()
 
-## these print statements are for debugging/testing
-print(len(stanzas))
-print(len(comments))
+# these print statements are for debugging/testing
+# print(len(stanzas))
+# print(len(comments))
+
 dupes = get_dupes(stanzas)
-#print(len(dupes))
+# print(len(dupes))
 
 # Better print formatting can be added
 # Statistics could be added to show how many times
@@ -91,8 +101,15 @@ dupes = get_dupes(stanzas)
 # equals more likelihood the stanza is a universal 'configlet'
 # additional logic could be applied to wrestle the output into better order during printing
 # EXAMPLE: Some aaa commands may not appear together, test for similar occurrences
-print("##################### STANZAS per '!' found 2 or more times #################")
-print("\n".join(dupes))
+# print("##################### STANZAS per '!' found 2 or more times #################")
+# print("\n".join(dupes))
+
+# stanzas now contains any stanza seen twice.
+# This loop will print only stanzas that were seen 3 or more times
+# The idea here is to reduce the noise and produce "universal" configlet material
+for k, v in Counter(stanzas).items():
+    if v >= 3:
+        print(k)
 
 # Coments list for review
 print("##################### COMMENTS  '!!' found in corpus #######################")
