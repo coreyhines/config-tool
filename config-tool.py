@@ -70,6 +70,14 @@ regex_sub = re.compile(r'^\s*!!.*', re.M)
 regex_sub2 = re.compile(r'^>.*', re.M)
 regex_sub3 = re.compile(r'^\s.*Command:.*', re.M)
 regex_sub4 = re.compile(r'^!.*boot\ssystem.*', re.M)
+# this is a work in progress
+# this will become a feature for a user defined regex based
+# on a flag and an argument like --regex 'some_regexi or just a string to ignore'
+# This will provide ability to ignore descriptions and other items in regard to
+# finding common config stanzas.
+# Note: the way this is done will remove the string, so it is destructive
+#regex_sub5 = re.compile(r'LEAF[0-9]|SPINE[0-9]$', re.M | re.IGNORECASE)
+regex_sub5 = re.compile(r'\s.*description.*', re.M | re.IGNORECASE)
 
 stanzas = []
 comments = []
@@ -83,6 +91,7 @@ for path in pathlib.Path(mydir).iterdir():
         subcontent = re.sub(regex_sub2, "", subcontent)
         subcontent = re.sub(regex_sub3, "", subcontent)
         subcontent = re.sub(regex_sub4, "", subcontent)
+        subcontent = re.sub(regex_sub5, "", subcontent)
 
         stanzas += subcontent.split('!')
         current_file.close()
