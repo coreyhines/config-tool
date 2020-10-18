@@ -46,21 +46,6 @@ import os
 from os.path import expanduser
 home = expanduser("~")
 
-mydir = home + "/vs-code/config-tool/configs/"
-
-# Using Collections Counter seems like it is working better than this method
-# def get_dupes(L):
-#     seen = set()
-#     seen2 = set()
-#     seen_add = seen.add
-#     seen2_add = seen2.add
-#     for item in L:
-#         if item in seen:
-#             seen2_add(item)
-#         else:
-#             seen_add(item)
-#     return list(seen2)
-
 
 def search_comments(line):
     regex_match = re.compile(r'^\s*!!.*', re.M)
@@ -72,23 +57,21 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "-c", "--count", type=str, default="3", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "all"],
     help="specify min count", required=False)
+parser.add_argument(
+    "-m", "--mask", type=str, default="",
+    help="specify a string to ignore, e.g. 'description'\n to ingnore and replace descriptions", required=False)
+parser.add_argument(
+    "-d", "--directory", type=str, default="",
+    help="directory that contains EOS configuration files", required=False)
 
 args = parser.parse_args()
 
+mydir = home + "/vs-code/config-tool/configs/"
 
 regex_sub = re.compile(r'^\s*!!.*', re.M)
 regex_sub2 = re.compile(r'^>.*', re.M)
 regex_sub3 = re.compile(r'^\s.*Command:.*', re.M)
 regex_sub4 = re.compile(r'^!.*boot\ssystem.*', re.M)
-
-# ↓↓↓ this is a work in progress
-# this will become a feature for a user defined regex based
-# on a flag and an argument like --regex 'some_regexi or just a string to ignore'
-# This will provide ability to ignore descriptions and other items in regard to
-# finding common config stanzas.
-# Note: the way this is done will remove the string, so it is destructive
-#regex_sub5 = re.compile(r'LEAF[0-9]|SPINE[0-9]$', re.M | re.IGNORECASE)
-regex_sub5 = re.compile(r'\s.*description.*', re.M | re.IGNORECASE)
 
 stanzas = []
 comments = []
@@ -109,26 +92,27 @@ for path in pathlib.Path(mydir).iterdir():
         subcontent = re.sub(regex_sub2, "", subcontent)
         subcontent = re.sub(regex_sub3, "", subcontent)
         subcontent = re.sub(regex_sub4, "", subcontent)
-        subcontent = re.sub(regex_sub5, "", subcontent)
+        if args.mask:
+            ignore_mask = args.mask
+            regex_sub5 = re.compile(
+                r'(.*{}).*'.format(ignore_mask), re.M | re.IGNORECASE)
+            subcontent = re.sub(regex_sub5, r"\1", subcontent)
 
         stanzas += subcontent.split('!')
         current_file.close()
 
-# these print statements are for debugging/testing
+# print statements for debugging/testing
 # print(len(stanzas))
-# print(len(comments))
 
-comments = set(comments)
-
-# stanzas now contains any stanza seen twice.
-# This loop will print only stanzas that were seen 3 or more times
-# The idea here is to reduce the noise and produce "universal" configlet material
+# This loop will print only stanzas that were seen 'min_count' or more times
 for k, v in Counter(stanzas).items():
-    if v >= int(mincount):
+    if v >= int(mincount) and v <= int(num_files):
         print(k)
         print('\x1b[6;30;42m' + "↑ SEEN ->(" +
               str(v) + "/" + num_files + ")<- TIMES ↑" + '\x1b[0m' + "\n")
 
 # Coments list for review
+# print(len(comments))
+comments = set(comments)
 print("\n\n##################### COMMENTS  '!!' found in corpus #######################")
 print("\n".join(comments))
