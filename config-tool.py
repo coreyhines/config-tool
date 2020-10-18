@@ -40,24 +40,26 @@ an attempt to recover EOS configuration stanzas that are common amongst a corpus
 import pathlib
 from collections import Counter
 import re
+import argparse
+import os
 
 from os.path import expanduser
 home = expanduser("~")
 
 mydir = home + "/vs-code/config-tool/configs/"
 
-
-def get_dupes(L):
-    seen = set()
-    seen2 = set()
-    seen_add = seen.add
-    seen2_add = seen2.add
-    for item in L:
-        if item in seen:
-            seen2_add(item)
-        else:
-            seen_add(item)
-    return list(seen2)
+# Using Collections Counter seems like it is working better than this method
+# def get_dupes(L):
+#     seen = set()
+#     seen2 = set()
+#     seen_add = seen.add
+#     seen2_add = seen2.add
+#     for item in L:
+#         if item in seen:
+#             seen2_add(item)
+#         else:
+#             seen_add(item)
+#     return list(seen2)
 
 
 def search_comments(line):
@@ -66,11 +68,20 @@ def search_comments(line):
     return list(re_match)
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-c", "--count", type=str, default="3", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "all"],
+    help="specify min count", required=False)
+
+args = parser.parse_args()
+
+
 regex_sub = re.compile(r'^\s*!!.*', re.M)
 regex_sub2 = re.compile(r'^>.*', re.M)
 regex_sub3 = re.compile(r'^\s.*Command:.*', re.M)
 regex_sub4 = re.compile(r'^!.*boot\ssystem.*', re.M)
-# this is a work in progress
+
+# ↓↓↓ this is a work in progress
 # this will become a feature for a user defined regex based
 # on a flag and an argument like --regex 'some_regexi or just a string to ignore'
 # This will provide ability to ignore descriptions and other items in regard to
@@ -81,6 +92,13 @@ regex_sub5 = re.compile(r'\s.*description.*', re.M | re.IGNORECASE)
 
 stanzas = []
 comments = []
+num_files = str(
+    len([name for name in os.listdir(mydir) if os.path.isfile(name)]))
+
+if args.count == "all":
+    mincount = num_files
+else:
+    mincount = args.count
 
 for path in pathlib.Path(mydir).iterdir():
     if path.is_file():
@@ -100,26 +118,17 @@ for path in pathlib.Path(mydir).iterdir():
 # print(len(stanzas))
 # print(len(comments))
 
-dupes = get_dupes(stanzas)
 comments = set(comments)
-# print(len(dupes))
-
-# Better print formatting can be added
-# Statistics could be added to show how many times
-# a stanza is found. This would be useful for scoring, more times seen
-# equals more likelihood the stanza is a universal 'configlet'
-# additional logic could be applied to wrestle the output into better order during printing
-# EXAMPLE: Some aaa commands may not appear together, test for similar occurrences
-# print("##################### STANZAS per '!' found 2 or more times #################")
-# print("\n".join(dupes))
 
 # stanzas now contains any stanza seen twice.
 # This loop will print only stanzas that were seen 3 or more times
 # The idea here is to reduce the noise and produce "universal" configlet material
 for k, v in Counter(stanzas).items():
-    if v >= 3:
+    if v >= int(mincount):
         print(k)
+        print('\x1b[6;30;42m' + "↑ SEEN ->(" +
+              str(v) + "/" + num_files + ")<- TIMES ↑" + '\x1b[0m' + "\n")
 
 # Coments list for review
-print("##################### COMMENTS  '!!' found in corpus #######################")
+print("\n\n##################### COMMENTS  '!!' found in corpus #######################")
 print("\n".join(comments))
