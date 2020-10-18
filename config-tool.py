@@ -42,9 +42,7 @@ from collections import Counter
 import re
 import argparse
 import os
-
 from os.path import expanduser
-home = expanduser("~")
 
 
 def search_comments(line):
@@ -66,6 +64,7 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+home = expanduser("~")
 mydir = home + "/vs-code/config-tool/configs/"
 
 regex_sub = re.compile(r'^\s*!!.*', re.M)
