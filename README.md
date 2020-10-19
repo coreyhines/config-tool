@@ -4,7 +4,7 @@ usage:
 
   `./config-tool.py --directory /path/to/configs --mask description --count all`
 
-  `--directory some/dir/or/path`, specifies the directory where the EOS configuration files are stored
+  `--directory /path/to/configs`, specifies the directory where the EOS configuration files are stored
 
   `--mask string` is an optional string that will be removed, and ignored as part of the comparison. This is useful for example when the only element that differs between two or more configs is due to the description
 
