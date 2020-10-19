@@ -1,7 +1,8 @@
 # config-tool
 An attempt to recover EOS configuration stanzas that are common amongst a corpus of configs. This output can be used to develop CloudVision Portal configlets, that can be applied at the container level.
-usage: 
-  `./config-tool --directory /path/to/configs --mask description --count all`
+usage:
+
+  `./config-tool.py --directory /path/to/configs --mask description --count all`
 
   `--directory some/dir/or/path`, specifies the directory where the EOS configuration files are stored
 
