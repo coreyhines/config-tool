@@ -61,26 +61,29 @@ parser.add_argument(
 parser.add_argument(
     "-d", "--directory", type=str, default="",
     help="directory that contains EOS configuration files", required=False)
-
 args = parser.parse_args()
-
-home = expanduser("~")
-mydir = home + "/vs-code/config-tool/configs/"
-
-regex_sub = re.compile(r'^\s*!!.*', re.M)
-regex_sub2 = re.compile(r'^>.*', re.M)
-regex_sub3 = re.compile(r'^\s.*Command:.*', re.M)
-regex_sub4 = re.compile(r'^!.*boot\ssystem.*', re.M)
 
 stanzas = []
 comments = []
+
+home = expanduser("~")
+if args.directory:
+    mydir = args.directory
+else:
+    mydir = home + "/vs-code/config-tool/configs/"
+
 num_files = str(
-    len([name for name in os.listdir(mydir) if os.path.isfile(name)]))
+    len([name for name in os.listdir(mydir) if os.path.isfile(mydir+'/'+name)]))
 
 if args.count == "all":
     mincount = num_files
 else:
     mincount = args.count
+
+regex_sub = re.compile(r'^\s*!!.*', re.M)
+regex_sub2 = re.compile(r'^>.*', re.M)
+regex_sub3 = re.compile(r'^\s.*Command:.*', re.M)
+regex_sub4 = re.compile(r'^!.*boot\ssystem.*', re.M)
 
 for path in pathlib.Path(mydir).iterdir():
     if path.is_file():
