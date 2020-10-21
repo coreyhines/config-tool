@@ -72,6 +72,10 @@ if args.directory:
 else:
     mydir = home + "/vs-code/config-tool/configs/"
 
+if not os.path.exists(mydir) or not os.path.isdir(mydir):
+  print("\r\n\t%s not Found; \r\n\r\n\t\tPlease specify directory containing config files with '--directory'\r\n" %mydir)
+  quit()
+
 num_files = str(
     len([name for name in os.listdir(mydir) if os.path.isfile(mydir+'/'+name)]))
 
