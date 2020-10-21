@@ -80,10 +80,12 @@ if args.count == "all":
 else:
     mincount = args.count
 
-regex_sub = re.compile(r'^\s*!!.*', re.M)
-regex_sub2 = re.compile(r'^>.*', re.M)
-regex_sub3 = re.compile(r'^\s.*Command:.*', re.M)
+# Series of regex statements to remove extraneous unusable config patterns
+regex_sub = re.compile(r'^\s*!!.*|^>.*|^end.*|', re.M)
+regex_sub2 = re.compile(r'^\s.*Command:.*', re.M)
+regex_sub3 = re.compile(r'(^\s+)!(.*)', re.M)
 regex_sub4 = re.compile(r'^!.*boot\ssystem.*', re.M)
+regex_sub5 = re.compile(r'(^\s+)#(.*)', re.M)
 
 for path in pathlib.Path(mydir).iterdir():
     if path.is_file():
@@ -92,13 +94,15 @@ for path in pathlib.Path(mydir).iterdir():
         comments += search_comments(content)
         subcontent = re.sub(regex_sub, "", content)
         subcontent = re.sub(regex_sub2, "", subcontent)
-        subcontent = re.sub(regex_sub3, "", subcontent)
+        # change any '!' with preceding whitespace to a '#'
+        # We will change those back at the end
+        subcontent = re.sub(regex_sub3, r"\1#\2", subcontent)
         subcontent = re.sub(regex_sub4, "", subcontent)
         if args.mask:
             ignore_mask = args.mask
-            regex_sub5 = re.compile(
+            regex_sub6 = re.compile(
                 r'(.*{}).*'.format(ignore_mask), re.M | re.IGNORECASE)
-            subcontent = re.sub(regex_sub5, r"\1", subcontent)
+            subcontent = re.sub(regex_sub6, r"\1", subcontent)
 
         stanzas += subcontent.split('!')
         current_file.close()
@@ -109,7 +113,8 @@ for path in pathlib.Path(mydir).iterdir():
 # This loop will print only stanzas that were seen 'min_count' or more times
 for k, v in sorted(Counter(stanzas).items()):
     if v >= int(mincount) and v <= int(num_files):
-        print(k)
+        # substitute the '  !' back in for the '#' used to trick the split parser earlier
+        print(re.sub(regex_sub5, r"\1!\2", k))
         print('\x1b[6;30;42m' + "↑ SEEN ->(" +
               str(v) + "/" + num_files + ")<- TIMES ↑" + '\x1b[0m' + "\n")
 
