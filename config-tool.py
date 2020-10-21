@@ -107,7 +107,7 @@ for path in pathlib.Path(mydir).iterdir():
 # print(len(stanzas))
 
 # This loop will print only stanzas that were seen 'min_count' or more times
-for k, v in Counter(stanzas).items():
+for k, v in sorted(Counter(stanzas).items()):
     if v >= int(mincount) and v <= int(num_files):
         print(k)
         print('\x1b[6;30;42m' + "↑ SEEN ->(" +
