@@ -26,3 +26,13 @@ RUN pip install --upgrade pip
 RUN pip install autopep8 dotbot linode_api4 rcvpapi ruamel.yaml Pyyaml lxml jsonrpclib cvprac pyeapi pylint apscheduler
 
 USER $USERNAME
+# set home
+ENV HOME /home/$USERNAME
+
+ENV TERM xterm
+
+ENV SHELL /bin/zsh
+ENV ZSH=/home/$USERNAME/.oh-my-zsh
+
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+RUN ln -s /workspaces/config-tool /home/$USERNAME/config-tool
