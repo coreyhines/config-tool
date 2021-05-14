@@ -5,8 +5,6 @@ import json
 import ssl
 import argparse
 import string
-import random
-import json
 
 
 def main():
