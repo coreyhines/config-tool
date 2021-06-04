@@ -12,7 +12,7 @@ import multiprocessing
 import numpy as np
 
 
-def grabconfig(hostnames, user, passwd, directory):
+def grab_config(hostnames, user, passwd, directory):
     for hostname in hostnames:
        host = hostname.strip()
        _create_unverified_https_context = ssl._create_unverified_context
@@ -74,21 +74,21 @@ def main():
      arr6 = list(split[5])
      arr7 = list(split[6])
      arr8 = list(split[7])
-     t1 = multiprocessing.Process(target=grabconfig, args=(
+     t1 = multiprocessing.Process(target=grab_config, args=(
          arr1, user, passwd, directory))
-     t2 = multiprocessing.Process(target=grabconfig, args=(
+     t2 = multiprocessing.Process(target=grab_config, args=(
          arr2, user, passwd, directory))
-     t3 = multiprocessing.Process(target=grabconfig, args=(
+     t3 = multiprocessing.Process(target=grab_config, args=(
          arr3, user, passwd, directory))
-     t4 = multiprocessing.Process(target=grabconfig, args=(
+     t4 = multiprocessing.Process(target=grab_config, args=(
          arr4, user, passwd, directory))
-     t5 = multiprocessing.Process(target=grabconfig, args=(
+     t5 = multiprocessing.Process(target=grab_config, args=(
          arr5, user, passwd, directory))
-     t6 = multiprocessing.Process(target=grabconfig, args=(
+     t6 = multiprocessing.Process(target=grab_config, args=(
          arr6, user, passwd, directory))
-     t7 = multiprocessing.Process(target=grabconfig, args=(
+     t7 = multiprocessing.Process(target=grab_config, args=(
          arr7, user, passwd, directory))
-     t8 = multiprocessing.Process(target=grabconfig, args=(
+     t8 = multiprocessing.Process(target=grab_config, args=(
          arr8, user, passwd, directory))
      #start threads in parallel
      #start_time = time.time()
