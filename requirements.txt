@@ -1,1 +1,2 @@
 numpy==1.20.3
+jsonrpclib==0.2.1

@@ -20,7 +20,6 @@ def grabconfig(hostnames, user, passwd, directory):
        response = os.system(f"ping -c 2 {host} > /dev/null 2>&1")
        if response == 0:
            pingstatus = "Network Active"
-           #print(f"ping status for {host}: {pingstatus}")
            try:
                device = Server(
                    'https://{}:{}@{}/command-api'.format(user, passwd, host))
@@ -29,7 +28,6 @@ def grabconfig(hostnames, user, passwd, directory):
                with open(directory + '/' + host + '.txt', mode='wt', encoding='utf-8') as writer:
                   for lines in result[1]['output']:
                      writer.write(lines)
-              # grabconfig(directory, user, passwd, host)
            except Exception as e:
                print(
                    f"something went wrong on {host}, check password\n\n{str(e)}\n")
@@ -68,7 +66,6 @@ def main():
 # run grabconfig() in each thread on subarray of eos devices
 # execute threads
      split = np.array_split(hostnames, 8)
-     #create two threads her t1 & t2
      arr1 = list(split[0])
      arr2 = list(split[1])
      arr3 = list(split[2])
@@ -94,6 +91,7 @@ def main():
      t8 = multiprocessing.Process(target=grabconfig, args=(
          arr8, user, passwd, directory))
      #start threads in parallel
+     #start_time = time.time()
      t1.start()
      t2.start()
      t3.start()
@@ -102,6 +100,7 @@ def main():
      t6.start()
      t7.start()
      t8.start()
+     #end_time = time.time() - start_time
      # join will wait for functions to finish
      t1.join()
      t2.join()
@@ -112,6 +111,8 @@ def main():
      t7.join()
      t8.join()
      print(f"Done!")
+     #print(
+     #    f"Processing {len(hostnames)} EOS devices took {end_time} time using multiprocessing")
 
 
 if __name__ == '__main__':
