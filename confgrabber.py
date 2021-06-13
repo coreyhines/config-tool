@@ -9,6 +9,14 @@ import numpy as np
 
 
 def grab_config(hostnames, user, passwd, directory):
+    """download configuration from EOS device using jsonrpc
+
+    Args:
+        hostnames (list): list of hostnames
+        user (string): user name
+        passwd (string): password
+        directory (string): directory name
+    """
     for hostname in hostnames:
        host = hostname.strip()
        _create_unverified_https_context = ssl._create_unverified_context

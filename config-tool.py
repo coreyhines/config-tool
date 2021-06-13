@@ -46,6 +46,14 @@ from os.path import expanduser
 
 
 def search_comments(line):
+    """collect the comments
+
+    Args:
+        line (string): line of config to search for comments
+
+    Returns:
+        list: list of lines with comments
+    """
     regex_match = re.compile(r'^\s*!!.*', re.M)
     re_match = re.findall(regex_match, line)
     return list(re_match)
