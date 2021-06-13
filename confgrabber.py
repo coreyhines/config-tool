@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 
 from jsonrpclib import Server
-import json
 import ssl
 import argparse
-import string
 import os
-import time
-import threading
 import multiprocessing
 import numpy as np
 
