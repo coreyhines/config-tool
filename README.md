@@ -1,3 +1,4 @@
+[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/coreyhines/config-tool)
 # config-tool
 An attempt to recover EOS configuration stanzas that are common amongst a corpus of configs. This output can be used to develop CloudVision Portal configlets, that can be applied at the container level.
 usage:

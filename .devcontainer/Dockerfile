@@ -1,4 +1,4 @@
-FROM python:3.8.5
+FROM python:3.9.5
 
 RUN apt update && apt install -y sudo \
     vim git zip \
@@ -23,7 +23,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 RUN pip install --upgrade pip
-RUN pip install autopep8 dotbot linode_api4 rcvpapi ruamel.yaml Pyyaml lxml jsonrpclib cvprac pyeapi pylint apscheduler
+RUN pip install autopep8 dotbot linode_api4 rcvpapi ruamel.yaml Pyyaml lxml jsonrpclib cvprac pyeapi pylint apscheduler bandit
 
 USER $USERNAME
 # set home
