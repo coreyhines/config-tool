@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/Users/chines/.pyenv/versions/3.9.5/bin/python",
+    "python.pythonPath": "/usr/local/bin/python",
     "python.testing.pytestArgs": [
         "tests"
     ],
