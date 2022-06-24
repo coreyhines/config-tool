@@ -32,9 +32,9 @@
 #    Written by:
 #       Corey Hines, Arista Networks
 #
-"""
-DESCRIPTION
-an attempt to recover EOS configuration stanzas that are common amongst a corpus of configs
+"""DESCRIPTION
+an attempt to recover EOS configuration stanzas
+that are common amongst a corpus of configs
 """
 
 import pathlib
@@ -54,7 +54,7 @@ def search_comments(line):
     Returns:
         list: list of lines with comments
     """
-    regex_match = re.compile(r'^\s*!!.*', re.M)
+    regex_match = re.compile(r"^\s*!!.*", re.M)
     re_match = re.findall(regex_match, line)
     return list(re_match)
 
@@ -62,14 +62,30 @@ def search_comments(line):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-       "-c", "--count", type=str, default="3", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "all"],
-       help="specify min count", required=False)
+        "-c",
+        "--count",
+        type=str,
+        default="3",
+        choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "all"],
+        help="specify min count",
+        required=False,
+    )
     parser.add_argument(
-        "-m", "--mask", type=str, default="",
-        help="specify a string to ignore, e.g. 'description'\n to ingnore and replace descriptions", required=False)
+        "-m",
+        "--mask",
+        type=str,
+        default="",
+        help="specify a string to ignore, e.g. 'description'\n to ingnore and replace descriptions",
+        required=False,
+    )
     parser.add_argument(
-        "-d", "--directory", type=str, default="",
-     help="directory that contains EOS configuration files", required=False)
+        "-d",
+        "--directory",
+        type=str,
+        default="",
+        help="directory that contains EOS configuration files",
+        required=False,
+    )
     args = parser.parse_args()
 
     stanzas = []
@@ -82,7 +98,14 @@ def main():
         mydir = home + "/vs-code/config-tool/configs/"
 
     num_files = str(
-        len([name for name in os.listdir(mydir) if os.path.isfile(mydir+'/'+name)]))
+        len(
+            [
+                name
+                for name in os.listdir(mydir)
+                if os.path.isfile(mydir + "/" + name)
+            ]
+        )
+    )
 
     if args.count == "all":
         mincount = num_files
@@ -90,11 +113,11 @@ def main():
         mincount = args.count
 
     # Series of regex statements to remove extraneous unusable config patterns
-    regex_sub = re.compile(r'^\s*!!.*|^>.*|^end.*|', re.M)
-    regex_sub2 = re.compile(r'^\s.*Command:.*', re.M)
-    regex_sub3 = re.compile(r'(^\s+)!(.*)', re.M)
-    regex_sub4 = re.compile(r'^!.*boot\ssystem.*', re.M)
-    regex_sub5 = re.compile(r'(^\s+)#(.*)', re.M)
+    regex_sub = re.compile(r"^\s*!!.*|^>.*|^end.*|", re.M)
+    regex_sub2 = re.compile(r"^\s.*Command:.*", re.M)
+    regex_sub3 = re.compile(r"(^\s+)!(.*)", re.M)
+    regex_sub4 = re.compile(r"^!.*boot\ssystem.*", re.M)
+    regex_sub5 = re.compile(r"(^\s+)#(.*)", re.M)
 
     for path in pathlib.Path(mydir).iterdir():
         if path.is_file():
@@ -110,29 +133,43 @@ def main():
             if args.mask:
                 ignore_mask = args.mask
                 regex_sub6 = re.compile(
-                    r'(.*{}).*'.format(ignore_mask), re.M | re.IGNORECASE)
+                    r"(.*{}).*".format(ignore_mask), re.M | re.IGNORECASE
+                )
                 subcontent = re.sub(regex_sub6, r"\1", subcontent)
 
-            stanzas += subcontent.split('!')
+            stanzas += subcontent.split("!")
             current_file.close()
 
     # print statements for debugging/testing
     # print(len(stanzas))
 
-    # This loop will print only stanzas that were seen 'min_count' or more times
+    """This loop will print only stanzas
+      that were seen 'min_count' or more times
+    """
     for k, v in sorted(Counter(stanzas).items()):
         if v >= int(mincount) and v <= int(num_files):
-            # substitute the '  !' back in for the '#' used to trick the split parser earlier
+            # substitute the '  !' back in for the '#'
+            # used to trick the split parser earlier
             print(re.sub(regex_sub5, r"\1!\2", k))
-            print('\x1b[6;30;42m' + "↑ SEEN ->(" +
-                  str(v) + "/" + num_files + ")<- TIMES ↑" + '\x1b[0m' + "\n")
+            print(
+                "\x1b[6;30;42m"
+                + "↑ SEEN ->("
+                + str(v)
+                + "/"
+                + num_files
+                + ")<- TIMES ↑"
+                + "\x1b[0m"
+                + "\n"
+            )
 
     # Coments list for review
     # print(len(comments))
     comments = set(comments)
-    print("\n\n##################### COMMENTS  '!!' found in corpus #######################")
+    print(
+        "\n\n##################### COMMENTS  '!!' found in corpus #######################"
+    )
     print("\n".join(comments))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

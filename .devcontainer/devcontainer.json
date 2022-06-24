@@ -8,7 +8,16 @@
 				"path": "zsh",
 				"args": [
 					"-l"
-				]
+				],
+        "python.formatting.provider": "black",
+        "python.formatting.blackArgs": [
+            "--line-length",
+            "79"
+        ],
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": false,
+        "python.linting.banditEnabled": true,
+        "python.linting.pycodestyleEnabled": false
 			}
 		}
 		//		"terminal.integrated.shell.linux": "/bin/zsh"
@@ -32,7 +41,7 @@
 	],
 	"postCreateCommand": "cd /tmp; wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && sh install.sh --unattended && if [ -d ~/dotfiles ]; then rm ~/.zshrc; /usr/local/bin/dotbot -c ~/dotfiles/install.conf.yaml; fi && cd /; cp ~/config-tool/.devcontainer/resolv.conf /etc/resolv.conf; mkdir ~/vs-code; ln -s /workspaces/config-tool ~/vs-code/config-tool",
 	"mounts": [ 
-		"source=${localEnv:HOME}/.ssh,target=/home/arista-dev/.ssh,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.ssh,target=/home/arista-dev/.ssh,type=bind,consistency=cached"
 	],
 	"remoteUser": "arista-dev"
 }
