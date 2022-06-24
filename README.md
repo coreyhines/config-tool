@@ -18,6 +18,8 @@ An attempt to recover EOS configuration stanzas that are common amongst a corpus
 
 An eapi script built with JSON/RPC to pull running-config files from Arista EOS devices. The script relies on a file called switches as an input list. It outputs the running-config to a specified directory. Valid credentials are required.
 
+## usage
+
 `./confgrabber.py --user someuser --passwd 'secret' --file switches --directory ./configs/`
 
 `--user string`, a valid user on the EOS devices
