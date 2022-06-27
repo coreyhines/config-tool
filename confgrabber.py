@@ -95,8 +95,9 @@ def main():
     parser.add_argument(
         "-s",
         "--sanitized",
-        type=str,
-        default="False",
+        # type=str,
+        action="store_true",
+        # default="False",
         help="flag for running-config to be sanitized: show running-config sanitized",
         required=False,
     )
@@ -106,7 +107,7 @@ def main():
     user = args.user
     passwd = args.passwd
     directory = args.directory
-    if args.sanitized == "yes":
+    if args.sanitized:
         sanitized = True
     else:
         sanitized = False
