@@ -136,6 +136,8 @@ def main():
     regex_sub3 = re.compile(r"(^\s+)!(.*)", re.M)
     regex_sub4 = re.compile(r"^!.*boot\ssystem.*", re.M)
     regex_sub5 = re.compile(r"(^\s+)#(.*)", re.M)
+    regex_sub6 = re.compile(r"RANCID-CONTENT-TYPE:.*", re.M)
+
 
     for path in pathlib.Path(mydir).iterdir():
         if path.is_file():
@@ -143,6 +145,7 @@ def main():
             content = current_file.read()
             comments += search_comments(content)
             subcontent = re.sub(regex_sub, "", content)
+            subcontent = re.sub(regex_sub6, "", subcontent)
             subcontent = re.sub(regex_sub2, "", subcontent)
             # change any '!' with preceding whitespace to a '#'
             # We will change those back at the end
