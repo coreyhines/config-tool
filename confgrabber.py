@@ -23,7 +23,8 @@ def grab_config(hostnames, user, passwd, directory, sanitized):
         ssl._create_default_https_context = _create_unverified_https_context
         response = os.system(f"ping -c 2 {host} > /dev/null 2>&1")
         if response == 0:
-            pingstatus = "Network Active"
+            pingstatus = f"{host}: Network Active"
+            print(pingstatus)
             try:
                 device = Server(
                     "https://{}:{}@{}/command-api".format(user, passwd, host)

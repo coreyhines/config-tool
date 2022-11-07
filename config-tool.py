@@ -66,7 +66,20 @@ def main():
         "--count",
         type=str,
         default="3",
-        choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "all"],
+        choices=[
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "all",
+            "none",
+        ],
         help="specify min count",
         required=False,
     )
@@ -89,6 +102,8 @@ def main():
     args = parser.parse_args()
 
     stanzas = []
+    device_stanzas = {}
+    common_stanzas = []
     comments = []
 
     home = expanduser("~")
@@ -109,6 +124,9 @@ def main():
 
     if args.count == "all":
         mincount = num_files
+    elif args.count == "none":
+        mincount = 1
+        maxcount = 1
     else:
         mincount = args.count
 
@@ -138,6 +156,7 @@ def main():
                 subcontent = re.sub(regex_sub6, r"\1", subcontent)
 
             stanzas += subcontent.split("!")
+            device_stanzas[path] = subcontent.split("!")
             current_file.close()
 
     # print statements for debugging/testing
@@ -146,21 +165,47 @@ def main():
     """This loop will print only stanzas
       that were seen 'min_count' or more times
     """
-    for k, v in sorted(Counter(stanzas).items()):
-        if v >= int(mincount) and v <= int(num_files):
-            # substitute the '  !' back in for the '#'
-            # used to trick the split parser earlier
-            print(re.sub(regex_sub5, r"\1!\2", k))
-            print(
-                "\x1b[6;30;42m"
-                + "↑ SEEN ->("
-                + str(v)
-                + "/"
-                + num_files
-                + ")<- TIMES ↑"
-                + "\x1b[0m"
-                + "\n"
-            )
+    if not maxcount:
+        for k, v in sorted(Counter(stanzas).items()):
+            if v >= int(mincount) and v <= int(num_files):
+                # substitute the '  !' back in for the '#'
+                # used to trick the split parser earlier
+                print(re.sub(regex_sub5, r"\1!\2", k))
+                print(
+                    "\x1b[6;30;42m"
+                    + "↑ SEEN ->("
+                    + str(v)
+                    + "/"
+                    + num_files
+                    + ")<- TIMES ↑"
+                    + "\x1b[0m"
+                    + "\n"
+                )
+    else:
+        for k, v in sorted(Counter(stanzas).items()):
+            if v > int(maxcount):
+                common_stanzas += k
+        for device in device_stanzas:
+            _con = []
+            for _stanza in device_stanzas[device]:
+                specific = True
+                for _common in common_stanzas:
+                    if _common == _stanza:
+                        specific = False
+                if specific:
+                    _con.append(_stanza)
+            if _con:
+                print(re.sub(regex_sub5, r"\1!\2", "".join(_con)))
+                print(
+                    "\x1b[6;30;42m"
+                     + "↑ Device Specific Config for: {} ->(".format(device)
+                     + ") ↑"
+                     + "\x1b[0m"
+                     + "\n"
+                 )
+
+    # Coments list for review
+
 
     # Coments list for review
     # print(len(comments))
