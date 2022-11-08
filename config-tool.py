@@ -124,19 +124,22 @@ def main():
 
     if args.count == "all":
         mincount = num_files
+        maxcount = num_files
     elif args.count == "none":
-        mincount = 1
         maxcount = 1
     else:
         mincount = args.count
+        maxcount = args.count
 
     # Series of regex statements to remove extraneous unusable config patterns
-    regex_sub = re.compile(r"^\s*!!.*|^>.*|^end.*|", re.M)
-    regex_sub2 = re.compile(r"^\s.*Command:.*", re.M)
-    regex_sub3 = re.compile(r"(^\s+)!(.*)", re.M)
-    regex_sub4 = re.compile(r"^!.*boot\ssystem.*", re.M)
-    regex_sub5 = re.compile(r"(^\s+)#(.*)", re.M)
-    regex_sub6 = re.compile(r"RANCID-CONTENT-TYPE:.*", re.M)
+    regex_sub_doublebang = re.compile(r"^\s*!!.*|^>.*|^end.*|", re.M)
+    regex_sub_command = re.compile(r"^\s.*Command:.*", re.M)
+    regex_sub_bang = re.compile(r"(^.\s+)!(.*)", re.M)
+    regex_sub_endbang = re.compile(r"(\w)!", re.M)
+    regex_sub_boot_system = re.compile(r"^!.*boot\ssystem.*", re.M)
+    regex_sub_comments = re.compile(r"(^\s+)#(.*)", re.M)
+    #regex_sub_comments = re.compile(r"(^.*)#(.*)", re.M)
+    regex_sub_rancid = re.compile(r"RANCID-CONTENT-TYPE:\sarista", re.IGNORECASE)
 
 
     for path in pathlib.Path(mydir).iterdir():
@@ -144,19 +147,21 @@ def main():
             current_file = open(path, "r")
             content = current_file.read()
             comments += search_comments(content)
-            subcontent = re.sub(regex_sub, "", content)
-            subcontent = re.sub(regex_sub6, "", subcontent)
-            subcontent = re.sub(regex_sub2, "", subcontent)
+            subcontent = re.sub(regex_sub_doublebang, "", content)
+            subcontent = re.sub(regex_sub_rancid, "", subcontent)
+            subcontent = re.sub(regex_sub_command, "", subcontent)
             # change any '!' with preceding whitespace to a '#'
+            # change any '!' at the end of a word to a '#' 
             # We will change those back at the end
-            subcontent = re.sub(regex_sub3, r"\1#\2", subcontent)
-            subcontent = re.sub(regex_sub4, "", subcontent)
+            subcontent = re.sub(regex_sub_bang, r"\1#\2", subcontent)
+            subcontent = re.sub(regex_sub_endbang, r"\1#", subcontent)
+            subcontent = re.sub(regex_sub_boot_system, "", subcontent)
             if args.mask:
                 ignore_mask = args.mask
-                regex_sub6 = re.compile(
+                regex_sub_mask = re.compile(
                     r"(.*{}).*".format(ignore_mask), re.M | re.IGNORECASE
                 )
-                subcontent = re.sub(regex_sub6, r"\1", subcontent)
+                subcontent = re.sub(regex_sub_mask, r"\1", subcontent)
 
             stanzas += subcontent.split("!")
             device_stanzas[path] = subcontent.split("!")
@@ -168,26 +173,21 @@ def main():
     """This loop will print only stanzas
       that were seen 'min_count' or more times
     """
-    if not maxcount:
+    if int(maxcount) > 1:
         for k, v in sorted(Counter(stanzas).items()):
             if v >= int(mincount) and v <= int(num_files):
                 # substitute the '  !' back in for the '#'
                 # used to trick the split parser earlier
-                print(re.sub(regex_sub5, r"\1!\2", k))
-                print(
-                    "\x1b[6;30;42m"
-                    + "↑ SEEN ->("
-                    + str(v)
-                    + "/"
-                    + num_files
-                    + ")<- TIMES ↑"
-                    + "\x1b[0m"
-                    + "\n"
-                )
+                # print(f"K is: ->{k}<-")
+                if k and not str.isspace(k):
+                  print(re.sub(regex_sub_comments, r"\1!\2", k))
+                  print(
+                      f'\x1b[6;30;42m ↑ SEEN ->({str(v)}/{num_files})<- TIMES ↑\x1b[0m\n'
+                  )
     else:
         for k, v in sorted(Counter(stanzas).items()):
             if v > int(maxcount):
-                common_stanzas += k
+                common_stanzas.append(k)
         for device in device_stanzas:
             _con = []
             for _stanza in device_stanzas[device]:
@@ -198,14 +198,10 @@ def main():
                 if specific:
                     _con.append(_stanza)
             if _con:
-                print(re.sub(regex_sub5, r"\1!\2", "".join(_con)))
+                print(re.sub(regex_sub_comments, r"\1!\2", "".join(_con)))
                 print(
-                    "\x1b[6;30;42m"
-                     + "↑ Device Specific Config for: {} ->(".format(device)
-                     + ") ↑"
-                     + "\x1b[0m"
-                     + "\n"
-                 )
+                    f'\x1b[6;30;42m ↑ Device Specific Config for: {device} ↑\x1b[0m\n'
+                )
 
     # Coments list for review
 
