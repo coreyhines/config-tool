@@ -59,6 +59,29 @@ def search_comments(line):
     return list(re_match)
 
 
+def fix_ups(line):
+    """ fix any issues with the stanzas
+    Example these lines will appear as one stanza:
+
+       hostname superswitch101
+       ip name-server vrf mgmt foo.com
+       ip name-server vrf mgmt foo2.com
+       dns domain bar.com 
+    
+    If hostname is separated, the following 3 
+    lines are likely to be shared among some or 
+    all of the configs
+
+       hostname superswitch101
+       !
+       ip name-server vrf mgmt foo.com
+       ip name-server vrf mgmt foo2.com
+       dns domain bar.com 
+    """   
+    regex_match = re.compile(r"^(hostname.*)", re.M)
+    re_match = re.sub(regex_match, r"\1\n!", line)
+    return str(re_match)
+       
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -138,7 +161,6 @@ def main():
     regex_sub_endbang = re.compile(r"(\w)!", re.M)
     regex_sub_boot_system = re.compile(r"^!.*boot\ssystem.*", re.M)
     regex_sub_comments = re.compile(r"(^\s+)#(.*)", re.M)
-    #regex_sub_comments = re.compile(r"(^.*)#(.*)", re.M)
     regex_sub_rancid = re.compile(r"RANCID-CONTENT-TYPE:\sarista", re.IGNORECASE)
 
 
@@ -147,6 +169,7 @@ def main():
             current_file = open(path, "r")
             content = current_file.read()
             comments += search_comments(content)
+            content = fix_ups(content)
             subcontent = re.sub(regex_sub_doublebang, "", content)
             subcontent = re.sub(regex_sub_rancid, "", subcontent)
             subcontent = re.sub(regex_sub_command, "", subcontent)
@@ -180,9 +203,14 @@ def main():
                 # used to trick the split parser earlier
                 # print(f"K is: ->{k}<-")
                 if k and not str.isspace(k):
-                  print(re.sub(regex_sub_comments, r"\1!\2", k))
                   print(
-                      f'\x1b[6;30;42m ↑ SEEN ->({str(v)}/{num_files})<- TIMES ↑\x1b[0m\n'
+                      f'\n\n\n\n\n\x1b[6;30;44m ↓ SEEN ->({str(v)}/{num_files})<- TIMES ↓\x1b[0m'
+                  )
+                  print("!")
+                  print(re.sub(regex_sub_comments, r"\1!\2", k).strip())
+                  print("!")
+                  print(
+                      f'\x1b[6;30;44m ↑ SEEN ->({str(v)}/{num_files})<- TIMES ↑\x1b[0m'
                   )
     else:
         for k, v in sorted(Counter(stanzas).items()):
@@ -197,10 +225,14 @@ def main():
                         specific = False
                 if specific:
                     _con.append(_stanza)
+                    _con.append("!")
             if _con:
+                print(
+                    f'\n\n\n\n\n\x1b[6;30;44m ↓ Device Specific Config for: {device} ↓\x1b[0m'
+                )
                 print(re.sub(regex_sub_comments, r"\1!\2", "".join(_con)))
                 print(
-                    f'\x1b[6;30;42m ↑ Device Specific Config for: {device} ↑\x1b[0m\n'
+                    f'\x1b[6;30;44m ↑ Device Specific Config for: {device} ↑\x1b[0m'
                 )
 
     # Coments list for review
