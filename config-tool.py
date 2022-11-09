@@ -233,9 +233,9 @@ def main():
                 print(
                     f'\n\n\n\n\n\x1b[6;30;44m ↓ Device Specific Config for: {device} ↓\x1b[0m'
                 )
-                print(re.sub(regex_sub_comments, r"\1!\2", "".join(_con)))
+                print(re.sub(regex_sub_comments, r"\1!\2", "".join(_con).strip()))
                 print(
-                    f'\x1b[6;30;44m ↑ Device Specific Config for: {device} ↑\x1b[0m'
+                    f'!\n\x1b[6;30;44m ↑ Device Specific Config for: {device} ↑\x1b[0m'
                 )
 
     # Coments list for review
