@@ -184,7 +184,7 @@ def main():
                 regex_sub_mask = re.compile(
                     r"(.*{}).*".format(ignore_mask), re.M | re.IGNORECASE
                 )
-                subcontent = re.sub(regex_sub_mask, r"\1", subcontent)
+                subcontent = re.sub(regex_sub_mask, r"\1 MASKED", subcontent)
 
             stanzas += subcontent.split("!")
             device_stanzas[path] = subcontent.split("!")
@@ -198,15 +198,18 @@ def main():
     """
     if int(maxcount) > 1:
         for k, v in sorted(Counter(stanzas).items()):
+            #print(f"v is: {v} and k is {k}")
             if v >= int(mincount) and v <= int(num_files):
                 # substitute the '  !' back in for the '#'
                 # used to trick the split parser earlier
-                # print(f"K is: ->{k}<-")
+                #print(f"K is: ->{k}<-")
                 if k and not str.isspace(k):
                   print(
                       f'\n\n\n\n\n\x1b[6;30;44m ↓ SEEN ->({str(v)}/{num_files})<- TIMES ↓\x1b[0m'
                   )
-                  print("!")
+                  # gah this is hacky stuff to get the "!" in correctly
+                  if not re.match("\n#", k):
+                    print("!")
                   print(re.sub(regex_sub_comments, r"\1!\2", k).strip())
                   print("!")
                   print(
@@ -224,8 +227,8 @@ def main():
                     if _common == _stanza:
                         specific = False
                 if specific:
-                    _con.append(_stanza)
                     _con.append("!")
+                    _con.append(_stanza)
             if _con:
                 print(
                     f'\n\n\n\n\n\x1b[6;30;44m ↓ Device Specific Config for: {device} ↓\x1b[0m'
