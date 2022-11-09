@@ -87,24 +87,22 @@ def fix_ups(line):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "-a",
+        "--absolute",
+        type=str,
+        default="common",
+        choices=[
+             "common",
+             "specific",
+         ],
+        help="specify an absolute config output type",
+        required=False,
+    )
+    parser.add_argument(
         "-c",
         "--count",
-        type=str,
-        default="3",
-        choices=[
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10",
-            "all",
-            "none",
-        ],
+        type=int,
+        default=3,
         help="specify min count",
         required=False,
     )
@@ -147,10 +145,10 @@ def main():
         )
     )
 
-    if args.count == "all":
+    if args.absolute == "common":
         mincount = num_files
         maxcount = num_files
-    elif args.count == "none":
+    elif args.absolute == "specific":
         maxcount = 1
     else:
         mincount = args.count
