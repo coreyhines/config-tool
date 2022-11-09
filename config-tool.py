@@ -34,7 +34,9 @@
 #
 """DESCRIPTION
 an attempt to recover EOS configuration stanzas
-that are common amongst a corpus of configs
+that are common or distinct amongst a corpus of configs
+This tool can be used to help create configlets for
+CloudVision Portal
 """
 
 import pathlib
