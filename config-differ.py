@@ -169,13 +169,6 @@ def main():
             current_file.close()
         else:
             print(f"File '{file}' does not exist, check path")
-
-    # print statements for debugging/testing
-    # print(len(stanzas))
-
-    """This loop will print only stanzas
-      that were seen 'min_count' or more times
-    """
     if type == "common":
         for k, v in sorted(Counter(stanzas).items()):
             if v >= int(mincount) and v <= int(maxcount):
@@ -188,6 +181,8 @@ def main():
         for k, v in sorted(Counter(stanzas).items()):
             if v > int(maxcount):
                 common_stanzas.append(k)
+        _global = []
+        _globaldict = {}
         for device in device_stanzas:
             _con = []
             for _stanza in device_stanzas[device]:
@@ -198,31 +193,31 @@ def main():
                 if specific:
                     # _con.append("!")
                     _con.append(_stanza)
-            if _con:
-                for item in _con:
-                    lines = []
-                    lines += item.split("\n")
-                for _k, _v in sorted(Counter(lines).items()):
-                    print(f"_k,_v is: {_k} , {_v}")
-                    if _v == 1:
-                        print(f"output is: {_k}")
-                        # print(
-                        #     re.sub(
-                        #         regex_sub_comments,
-                        #         r"\1!\2",
-                        #         "".join(_k).strip(),
-                        #     )
-                        # )
-
-    # Coments list for review
-
-    # Coments list for review
-    # print(len(comments))
-    # comments = set(comments)
-    # print(
-    #     "\n\n##################### COMMENTS  '!!' found in corpus #######################"
-    # )
-    # print("\n".join(comments))
+                    _global.append(_stanza)
+                    # print(f"stanza is {_stanza}")
+            _globaldict[device] = _con
+        print(
+            f"\x1b[0;30;42m{'In device file' : <25}\x1b[0m \x1b[0;37;41m{'NOT in device file' : <25}\x1b[0m \x1b[0;30;47m{'config line' : <40}\x1b[0m\n"
+        )
+        for device in _globaldict:
+            for _stanza in _globaldict[device]:
+                for line in _stanza.split("\n"):
+                    lineCounter = 0
+                    _peer = []
+                    for _gstanza in _global:
+                        for _gline in _gstanza.split("\n"):
+                            if line == _gline:
+                                lineCounter += 1
+                    if lineCounter == 1:
+                        _peers = list(_globaldict.keys())
+                        for _peer in _peers:
+                            if device != _peer:
+                                otherDevice = _peer
+                            else:
+                                otherDevice = list(set(_peers) - {_peer})[0]
+                        print(
+                            f"\x1b[6;30;42m{device : <25}\x1b[0m \x1b[6;37;41m{otherDevice : <25}\x1b[0m {line : <40}"
+                        )
 
 
 if __name__ == "__main__":
