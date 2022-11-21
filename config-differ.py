@@ -98,6 +98,13 @@ def main():
         required=True,
     )
     parser.add_argument(
+        "-c",
+        "--csv",
+        action="store_true",
+        help="specify output style, default or csv. Default output is to screen with colors",
+        required=False,
+    )
+    parser.add_argument(
         "-f",
         "--files",
         type=str,
@@ -118,6 +125,11 @@ def main():
         myfiles = args.files
     else:
         print(f"This didn't work: arg.files is: {arg.files}")
+    
+    if args.csv:
+        csv = True
+    else:
+        csv = False
 
     # num_files = str(
     #     len(
@@ -196,9 +208,13 @@ def main():
                     _global.append(_stanza)
                     # print(f"stanza is {_stanza}")
             _globaldict[device] = _con
-        print(
-            f"\x1b[0;30;42m{'In device file' : <25}\x1b[0m \x1b[0;37;41m{'NOT in device file' : <25}\x1b[0m \x1b[0;30;47m{'config line' : <40}\x1b[0m\n"
-        )
+        if csv:
+            print(
+            f"In device file,NOT in device file,config line\n")
+        else:
+            print(
+                f"\x1b[0;30;42m{'In device file' : <25}\x1b[0m \x1b[0;37;41m{'NOT in device file' : <25}\x1b[0m \x1b[0;30;47m{'config line' : <40}\x1b[0m\n"
+            )
         for device in _globaldict:
             for _stanza in _globaldict[device]:
                 for line in _stanza.split("\n"):
@@ -215,9 +231,12 @@ def main():
                                 otherDevice = _peer
                             else:
                                 otherDevice = list(set(_peers) - {_peer})[0]
-                        print(
-                            f"\x1b[6;30;42m{device : <25}\x1b[0m \x1b[6;37;41m{otherDevice : <25}\x1b[0m {line : <40}"
-                        )
+                        if csv:
+                            print(f"{device},{otherDevice},{line}")
+                        else:
+                            print(
+                                f"\x1b[6;30;42m{device : <25}\x1b[0m \x1b[6;37;41m{otherDevice : <25}\x1b[0m {line : <40}"
+                            )
 
 
 if __name__ == "__main__":
