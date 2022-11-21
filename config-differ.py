@@ -94,23 +94,22 @@ def main():
             "common",
             "diffs",
         ],
-        help="specify config output type",
+        help="specify config output type: common stanzas or differences between files",
         required=True,
     )
     parser.add_argument(
         "-c",
         "--csv",
         action="store_true",
-        help="specify output style, default or csv. Default output is to screen with colors",
+        help="specify output style: default or csv. Default output is to screen with colors",
         required=False,
     )
     parser.add_argument(
         "-f",
         "--files",
         type=str,
-        nargs="+",
-        default="",
-        help="directory that contains EOS configuration files",
+        nargs=2,
+        help="Specify the EOS device configuration files to compare",
         required=True,
     )
     args = parser.parse_args()
@@ -126,20 +125,14 @@ def main():
     else:
         print(f"This didn't work: arg.files is: {arg.files}")
     
+    if args.csv and args.type == "common":
+        print(f"\nOutput to CSV with option {args.type} is not supported")
+        raise SystemExit(1)
+
     if args.csv:
         csv = True
     else:
         csv = False
-
-    # num_files = str(
-    #     len(
-    #         [
-    #             name
-    #             for name in os.listdir(mydir)
-    #             if os.path.isfile(mydir + "/" + name)
-    #         ]
-    #     )
-    # )
 
     if args.type == "common":
         type = "common"
