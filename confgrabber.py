@@ -121,7 +121,7 @@ def main():
     # create a thread for each list
     # run grabconfig() in each thread on subarray of eos devices
     # execute threads
-    split = np.array_split(hostnames, 8)
+    split = np.array_split(hostnames, 10)
     arr1 = list(split[0])
     arr2 = list(split[1])
     arr3 = list(split[2])
@@ -130,6 +130,8 @@ def main():
     arr6 = list(split[5])
     arr7 = list(split[6])
     arr8 = list(split[7])
+    arr9 = list(split[8])
+    arr10 = list(split[9])
     t1 = multiprocessing.Process(
         target=grab_config, args=(arr1, user, passwd, directory, sanitized)
     )
@@ -154,6 +156,12 @@ def main():
     t8 = multiprocessing.Process(
         target=grab_config, args=(arr8, user, passwd, directory, sanitized)
     )
+    t9 = multiprocessing.Process(
+        target=grab_config, args=(arr9, user, passwd, directory, sanitized)
+    )
+    t10 = multiprocessing.Process(
+        target=grab_config, args=(arr10, user, passwd, directory, sanitized)
+    )
     # start threads in parallel
     # start_time = time.time()
     t1.start()
@@ -164,6 +172,8 @@ def main():
     t6.start()
     t7.start()
     t8.start()
+    t9.start()
+    t10.start()
     # end_time = time.time() - start_time
     # join will wait for functions to finish
     t1.join()
@@ -174,6 +184,8 @@ def main():
     t6.join()
     t7.join()
     t8.join()
+    t9.join()
+    t10.join()
     print(f"Done!")
     # print(
     #    f"Processing {len(hostnames)} EOS devices took {end_time} time using multiprocessing")

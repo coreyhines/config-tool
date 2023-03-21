@@ -1,10 +1,10 @@
-FROM python:3.9.13
+FROM python:3.9.16
 
-RUN apt update && apt install -y sudo \
-    vim git zip \
-    cloc lastpass-cli dnsutils \
+RUN apt update && apt install -y \
+    sudo vim git zip cloc dnsutils \
     zsh zsh-syntax-highlighting zsh-doc \
-    less liquidprompt
+    less liquidprompt \
+    inetutils-ping
 
 RUN apt -y dist-upgrade
 
@@ -23,7 +23,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 RUN pip install --upgrade pip
-RUN pip install black autopep8 dotbot linode_api4 rcvpapi ruamel.yaml Pyyaml lxml jsonrpclib cvprac pyeapi pylint apscheduler bandit numpy
+RUN pip install black autopep8 dotbot linode_api4 ruamel.yaml Pyyaml lxml jsonrpclib cvprac pyeapi pylint apscheduler bandit numpy
 
 USER $USERNAME
 # set home
