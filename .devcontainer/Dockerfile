@@ -8,8 +8,8 @@ RUN apt update && apt install -y \
 
 RUN apt -y dist-upgrade
 
-ARG USERNAME=arista-dev
-ARG USER_UID=1002
+ARG USERNAME=vscode
+ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
 # Create the user

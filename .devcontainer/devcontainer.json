@@ -1,47 +1,43 @@
 {
-	"name": "Arista dev",
-	"context": "..",
-	"dockerFile": "Dockerfile",
-	"settings": { 
-		"terminal.integrated.profiles.linux": {
-			"zsh (login)": {
-				"path": "zsh",
-				"args": [
-					"-l"
-				],
+  "name": "Arista dev",
+  "context": "..",
+  "dockerFile": "Dockerfile",
+  "settings": {
+    "terminal.integrated.profiles.linux": {
+      "zsh (login)": {
+        "path": "zsh",
+        "args": ["-l"],
         "python.formatting.provider": "black",
-        "python.formatting.blackArgs": [
-            "--line-length",
-            "79"
-        ],
+        "python.formatting.blackArgs": ["--line-length", "79"],
         "python.linting.enabled": true,
         "python.linting.pylintEnabled": false,
         "python.linting.banditEnabled": true,
         "python.linting.pycodestyleEnabled": false
-			}
-		}
-		//		"terminal.integrated.shell.linux": "/bin/zsh"
-	},
-	"extensions": [
-		"redhat.vscode-yaml",
-		"ms-python.python",
-		"ms-kubernetes-tools.vscode-kubernetes-tools",
-		"ms-azuretools.vscode-docker",
-		"ms-kubernetes-tools.vscode-kubernetes-tools",
-		"github.vscode-pull-request-github",
-		"ms-kubernetes-tools.vscode-kubernetes-tools",
-		"github.vscode-pull-request-github",
-		"aristapublisher.eos",
-		"vscoss.vscode-ansible",
-		"eamodio.gitlens",
-		"esbenp.prettier-vscode",
-		"wolfmah.ansible-vault-inline",
-		"ms-python.python",
+      }
+    }
+    //		"terminal.integrated.shell.linux": "/bin/zsh"
+  },
+  "extensions": [
+    "redhat.vscode-yaml",
+    "ms-python.python",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "ms-azuretools.vscode-docker",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "github.vscode-pull-request-github",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "github.vscode-pull-request-github",
+    "aristapublisher.eos",
+    "vscoss.vscode-ansible",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "wolfmah.ansible-vault-inline",
+    "ms-python.python",
     "ms-python.vscode-pylance"
-	],
-	"postCreateCommand": "cd /tmp; wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && sh install.sh --unattended && if [ -d ~/dotfiles ]; then rm ~/.zshrc; /usr/local/bin/dotbot -c ~/dotfiles/install.conf.yaml; fi && cd /; cp ~/config-tool/.devcontainer/resolv.conf /etc/resolv.conf; mkdir ~/vs-code; ln -s /workspaces/config-tool ~/vs-code/config-tool",
-	"mounts": [ 
-		"source=${localEnv:HOME}/.ssh,target=/home/arista-dev/.ssh,type=bind,consistency=cached"
-	],
-	"remoteUser": "arista-dev"
+  ],
+  "postCreateCommand": "if [ -d ~/dotfiles ]; then rm ~/.zshrc; /usr/local/bin/dotbot -c ~/dotfiles/install.conf.yaml; fi && cd /; mkdir ~/vs-code; ln -s /workspaces/config-tool ~/vs-code/config-tool",
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/arista-dev/.ssh,type=bind,consistency=cached"
+  ],
+  "remoteUser": "vscode",
+  "containerUser": "vscode"
 }

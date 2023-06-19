@@ -1,0 +1,18 @@
+[
+    "redhat.vscode-yaml",
+    "ms-python.python",
+    "ms-azuretools.vscode-docker",
+    "github.vscode-pull-request-github",
+    "aristapublisher.eos",
+    "vscoss.vscode-ansible",
+    "docsmsft.docs-yaml",
+    "ms-python.vscode-pylance",
+    "wolfmah.ansible-vault-inline",
+    "timonwong.ansible-autocomplete",
+    "redhat.ansible",
+    "GitLab.gitlab-workflow",
+    "redhat.ansible",
+    "eamodio.gitlens",
+    "aristapublisher.eos",
+    "gitlab.gitlab-workflow"
+]
