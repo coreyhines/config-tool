@@ -2,42 +2,56 @@
   "name": "Arista dev",
   "context": "..",
   "dockerFile": "Dockerfile",
-  "settings": {
-    "terminal.integrated.profiles.linux": {
-      "zsh (login)": {
-        "path": "zsh",
-        "args": ["-l"],
+  "postCreateCommand": "rm -rf ~/dotfiles; git clone --depth 1 git@github.com:coreyhines/dotfiles.git; cd /tmp; wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && rm -rf ~/.oh-my-zsh; ZSH= sh install.sh --unattended && cd ~/.oh-my-zsh/custom/plugins && git clone https://github.com/zsh-users/zsh-autosuggestions && git clone https://github.com/zsh-users/zsh-syntax-highlighting && if [ -d ~/dotfiles ]; then rm ~/.zshrc; /usr/local/bin/dotbot -c ~/dotfiles/install.conf.yaml; fi && cd /",
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/corey/.ssh,type=bind,consistency=cached"
+  ],
+  "runArgs": [
+    "--cap-add=sys_admin",
+    "--security-opt",
+    "seccomp=unconfined",
+    "--device",
+    "/dev/fuse",
+    "--security-opt",
+    "label=disable",
+    "--security-opt",
+    "apparmor=unconfined"
+  ],
+  "remoteUser": "corey",
+  "containerUser": "corey",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "remote.containers.dockerPath": "podman-devcontainer-wrapper",
+        "python.pythonPath": "/usr/local/bin/python",
+        "python.testing.pytestArgs": ["tests"],
+        "python.testing.unittestEnabled": false,
+        "python.testing.nosetestsEnabled": false,
+        "python.testing.pytestEnabled": true,
+        "python.linting.flake8Enabled": false,
         "python.formatting.provider": "black",
         "python.formatting.blackArgs": ["--line-length", "79"],
         "python.linting.enabled": true,
         "python.linting.pylintEnabled": false,
         "python.linting.banditEnabled": true,
-        "python.linting.pycodestyleEnabled": false
-      }
+        "python.linting.pycodestyleEnabled": false,
+        "git.detectSubmodulesLimit": 30
+      },
+      "extensions": [
+        "redhat.vscode-yaml",
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "github.vscode-pull-request-github",
+        "aristapublisher.eos",
+        "vscoss.vscode-ansible",
+        "docsmsft.docs-yaml",
+        "ms-python.vscode-pylance",
+        "wolfmah.ansible-vault-inline",
+        "timonwong.ansible-autocomplete",
+        "redhat.ansible",
+        "eamodio.gitlens",
+        "gitlab.gitlab-workflow"
+      ]
     }
-    //		"terminal.integrated.shell.linux": "/bin/zsh"
-  },
-  "extensions": [
-    "redhat.vscode-yaml",
-    "ms-python.python",
-    "ms-kubernetes-tools.vscode-kubernetes-tools",
-    "ms-azuretools.vscode-docker",
-    "ms-kubernetes-tools.vscode-kubernetes-tools",
-    "github.vscode-pull-request-github",
-    "ms-kubernetes-tools.vscode-kubernetes-tools",
-    "github.vscode-pull-request-github",
-    "aristapublisher.eos",
-    "vscoss.vscode-ansible",
-    "eamodio.gitlens",
-    "esbenp.prettier-vscode",
-    "wolfmah.ansible-vault-inline",
-    "ms-python.python",
-    "ms-python.vscode-pylance"
-  ],
-  "postCreateCommand": "if [ -d ~/dotfiles ]; then rm ~/.zshrc; /usr/local/bin/dotbot -c ~/dotfiles/install.conf.yaml; fi && cd /; mkdir ~/vs-code; ln -s /workspaces/config-tool ~/vs-code/config-tool",
-  "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/home/arista-dev/.ssh,type=bind,consistency=cached"
-  ],
-  "remoteUser": "vscode",
-  "containerUser": "vscode"
+  }
 }
