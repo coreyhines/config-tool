@@ -1,10 +1,10 @@
 {
-  "name": "Arista dev",
+  "name": "config-tool dev",
   "context": "..",
   "dockerFile": "Dockerfile",
-  "postCreateCommand": "rm -rf ~/dotfiles; git clone --depth 1 git@github.com:coreyhines/dotfiles.git; cd /tmp; wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && rm -rf ~/.oh-my-zsh; ZSH= sh install.sh --unattended && cd ~/.oh-my-zsh/custom/plugins && git clone https://github.com/zsh-users/zsh-autosuggestions && git clone https://github.com/zsh-users/zsh-syntax-highlighting && if [ -d ~/dotfiles ]; then rm ~/.zshrc; /usr/local/bin/dotbot -c ~/dotfiles/install.conf.yaml; fi && cd /",
+  "postCreateCommand": "rm -rf ~/dotfiles; git clone --depth 1 git@github.com:coreyhines/dotfiles.git; cd /tmp; wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && rm -rf ~/.oh-my-zsh; ZSH= sh install.sh --unattended && cd ~/.oh-my-zsh/custom/plugins && git clone https://github.com/zsh-users/zsh-autosuggestions && git clone https://github.com/zsh-users/zsh-syntax-highlighting && if [ -d ~/dotfiles ]; then rm ~/.zshrc; /usr/local/bin/dotbot -c ~/dotfiles/install.conf.yaml; fi",
   "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/home/corey/.ssh,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/.ssh,target=/home/${localEnv:USER}/.ssh,type=bind,consistency=cached"
   ],
   "build": {
     "args": {
@@ -29,7 +29,7 @@
   "customizations": {
     "vscode": {
       "settings": {
-        "remote.containers.dockerPath": "podman-devcontainer-wrapper",
+        // "remote.containers.dockerPath": "podman-devcontainer-wrapper",
         "python.pythonPath": "/usr/local/bin/python",
         "python.testing.pytestArgs": ["tests"],
         "python.testing.unittestEnabled": false,
@@ -47,15 +47,10 @@
       "extensions": [
         "redhat.vscode-yaml",
         "ms-python.python",
-        "ms-azuretools.vscode-docker",
         "github.vscode-pull-request-github",
         "aristapublisher.eos",
-        "vscoss.vscode-ansible",
         "docsmsft.docs-yaml",
         "ms-python.vscode-pylance",
-        "wolfmah.ansible-vault-inline",
-        "timonwong.ansible-autocomplete",
-        "redhat.ansible",
         "eamodio.gitlens",
         "gitlab.gitlab-workflow"
       ]
