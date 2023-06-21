@@ -8,9 +8,13 @@ RUN apt update && apt install -y \
 
 RUN apt -y dist-upgrade
 
-ARG USERNAME=corey
-ARG USER_UID=501
-ARG USER_GID="20"
+ARG USER
+ARG UID
+ARG GID
+
+ENV USERNAME=$USER
+ENV USER_UID=$UID
+ENV USER_GID=$GID
 
 # Create the user
 #RUN groupadd --gid $USER_GID $USERNAME \

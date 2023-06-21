@@ -6,6 +6,13 @@
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/corey/.ssh,type=bind,consistency=cached"
   ],
+  "build": {
+    "args": {
+      "USER": "${localEnv:USER}",
+      "UID": "${localEnv:UID}",
+      "GID": "${localEnv:GID}"
+    }  
+  },
   "runArgs": [
     "--cap-add=sys_admin",
     "--security-opt",
@@ -17,8 +24,8 @@
     "--security-opt",
     "apparmor=unconfined"
   ],
-  "remoteUser": "corey",
-  "containerUser": "corey",
+  "remoteUser": "${localEnv:USER}",
+  "containerUser": "${localEnv:USER}",
   "customizations": {
     "vscode": {
       "settings": {
