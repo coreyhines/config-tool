@@ -1,5 +1,5 @@
 {
-  "remote.containers.dockerPath": "podman-devcontainer-wrapper",
+  // "remote.containers.dockerPath": "podman-devcontainer-wrapper",
   "python.pythonPath": "/usr/local/bin/python",
   "python.testing.pytestArgs": ["tests"],
   "python.testing.unittestEnabled": false,
@@ -11,5 +11,6 @@
   "python.linting.enabled": true,
   "python.linting.pylintEnabled": false,
   "python.linting.banditEnabled": true,
-  "python.linting.pycodestyleEnabled": false,
+"python.linting.pycodestyleEnabled": false,
+"remote.SSH.defaultForwardedPorts": [],
 }

@@ -1,4 +1,4 @@
-FROM python:3.9.16
+FROM python:3.9-bookworm
 
 RUN apt update && apt install -y \
     sudo vim git zip cloc dnsutils \
