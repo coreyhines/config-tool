@@ -3,3 +3,4 @@ switches
 configs/
 .DS_Store
 dotfiles/
+hosts.txt

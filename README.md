@@ -14,6 +14,7 @@ An attempt to recover EOS configuration stanzas that are common amongst a corpus
 
 `--count #|all` this option "raises" or "lowers" the bar of what a "common match" means. Higher number here will mean that the stanza must appear at least the number of times specified in `--count`. `--count all` means the stanza must appear in all config files to be counted as a common match.
 
+
 # confgrabber
 
 An eapi script built with JSON/RPC to pull running-config files from Arista EOS devices. The script relies on a file called switches as an input list. It outputs the running-config to a specified directory. Valid credentials are required.
@@ -29,3 +30,8 @@ An eapi script built with JSON/RPC to pull running-config files from Arista EOS 
 `--file string`, specifies the input list of switches
 
 `--directory string`, specifies the directory where the EOS configuration will be written to and stored
+
+
+# Rust Implementation
+
+See [RUST_USAGE.md](./RUST_USAGE.md) for instructions on building and using the Rust version of the tool. The Rust implementation provides a fast, parallelized alternative to the Python scripts for grabbing and processing EOS configurations.
