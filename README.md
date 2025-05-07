@@ -32,6 +32,6 @@ An eapi script built with JSON/RPC to pull running-config files from Arista EOS 
 `--directory string`, specifies the directory where the EOS configuration will be written to and stored
 
 
-# Rust Implementation
+# confgrabber - Rust Implementation
 
 See [RUST_USAGE.md](./RUST_USAGE.md) for instructions on building and using the Rust version of the tool. The Rust implementation provides a fast, parallelized alternative to the Python scripts for grabbing and processing EOS configurations.
