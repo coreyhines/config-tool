@@ -1,0 +1,2 @@
+jsonrpclib-pelix>=0.4.3.4
+ping3>=4.0.4

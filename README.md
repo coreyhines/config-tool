@@ -4,7 +4,17 @@
 
 An attempt to recover EOS configuration stanzas that are common amongst a corpus of configs. This output can be used to develop CloudVision Portal configlets, that can be applied at the container level.
 
-## usage:
+## Getting Started
+
+See the [Build Guide](./docs/BUILD.md) for detailed instructions on:
+- Setting up the Python environment
+- Building the optional Rust binary
+- Using the development container
+- Performance considerations and choosing between Python/Rust implementations
+
+## Python Tools
+
+### config-tool
 
 `./config-tool.py --directory /path/to/configs --mask description --count all`
 
@@ -14,12 +24,11 @@ An attempt to recover EOS configuration stanzas that are common amongst a corpus
 
 `--count #|all` this option "raises" or "lowers" the bar of what a "common match" means. Higher number here will mean that the stanza must appear at least the number of times specified in `--count`. `--count all` means the stanza must appear in all config files to be counted as a common match.
 
-
-# confgrabber
+### confgrabber
 
 An eapi script built with JSON/RPC to pull running-config files from Arista EOS devices. The script relies on a file called switches as an input list. It outputs the running-config to a specified directory. Valid credentials are required.
 
-## usage:
+Usage:
 
 `./confgrabber.py --user someuser --passwd 'secret' --file switches --directory ./configs/`
 
@@ -31,7 +40,10 @@ An eapi script built with JSON/RPC to pull running-config files from Arista EOS 
 
 `--directory string`, specifies the directory where the EOS configuration will be written to and stored
 
+## Rust Implementation
 
-# confgrabber - Rust Implementation
+A high-performance Rust version of the confgrabber tool is available. See:
+- [Build Guide](./docs/BUILD.md) for build and installation instructions
+- [RUST_USAGE.md](./RUST_USAGE.md) for usage details
 
-See [RUST_USAGE.md](./RUST_USAGE.md) for instructions on building and using the Rust version of the tool. The Rust implementation provides a fast, parallelized alternative to the Python scripts for grabbing and processing EOS configurations.
+The Rust implementation provides a fast, parallelized alternative to the Python scripts for grabbing and processing EOS configurations.

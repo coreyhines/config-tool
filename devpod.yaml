@@ -1,0 +1,43 @@
+# DevPod configuration using existing devcontainer setup
+image:
+  dockerfile: .devcontainer/Dockerfile
+  context: .
+  buildArgs:
+    USER: ${DEVPOD_USER}
+    UID: ${DEVPOD_UID}
+    GID: ${DEVPOD_GID}
+
+workspaceFolder: /workspace
+mountWorkspaceSource: true
+
+# Mounts from devcontainer.json
+mounts:
+  - source: ${HOME}/.ssh
+    target: /home/${DEVPOD_USER}/.ssh
+
+# Resource requirements
+options:
+  cpus: 2
+  memory: 4096
+  disk: 32
+
+# Post-create command
+init: chmod +x .devcontainer/post-create.sh && .devcontainer/post-create.sh
+
+# Security options from devcontainer.json
+privileged: false
+securityOpts:
+  - no-new-privileges:true
+  - label=disable
+  - apparmor=unconfined
+  - seccomp=unconfined
+
+# Additional capabilities
+capabilities:
+  - SYS_ADMIN
+
+# Device mounts
+devices:
+  - /dev/fuse
+
+# IDE settings will be handled by VS Code settings sync 

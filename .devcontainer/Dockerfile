@@ -1,42 +1,69 @@
-FROM python:3.9-bookworm
+# Use Python slim image as base
+FROM python:3.12-slim-bookworm as final
 
-RUN apt update && apt install -y \
-    sudo vim git zip cloc dnsutils \
-    zsh zsh-syntax-highlighting zsh-doc \
-    less liquidprompt \
-    inetutils-ping
-
-RUN apt -y dist-upgrade
+# Install system packages and cleanup in one layer
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    sudo \
+    vim \
+    git \
+    zip \
+    cloc \
+    bind9-dnsutils \
+    zsh \
+    zsh-syntax-highlighting \
+    less \
+    liquidprompt \
+    inetutils-ping \
+    curl \
+    fonts-powerline \
+    fontconfig \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 ARG USER
 ARG UID
 ARG GID
 
-ENV USERNAME=$USER
-ENV USER_UID=$UID
-ENV USER_GID=$GID
+ENV USERNAME=$USER \
+    USER_UID=$UID \
+    USER_GID=$GID \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH="/home/$USER/.local/bin:$PATH" \
+    SHELL=/bin/zsh
 
-# Create the user
-#RUN groupadd --gid $USER_GID $USERNAME \
+# Create the user and setup sudo
 RUN useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    #
-    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
-    && apt-get update \
-    && apt-get install -y sudo \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 USER $USERNAME
-RUN pip install --upgrade pip
-RUN pip install black autopep8 dotbot linode_api4 ruamel.yaml Pyyaml lxml jsonrpclib cvprac pyeapi pylint apscheduler bandit numpy
+WORKDIR /home/$USERNAME
 
-# set home
-ENV HOME /home/$USERNAME
+# Install uv and Python packages
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && . ~/.bashrc \
+    && export PATH="/home/$USERNAME/.local/bin:$PATH" \
+    && /home/$USERNAME/.local/bin/uv pip install --upgrade pip \
+    && /home/$USERNAME/.local/bin/uv pip install \
+        black==24.1.1 \
+        flake8==7.0.0 \
+        pytest==8.0.0 \
+        pytest-cov==4.1.0 \
+        mypy==1.8.0 \
+        pylint==3.0.3 \
+        rope==1.12.0
 
-ENV TERM xterm
+# Set up ZSH with Oh My Zsh and plugins
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended \
+    && git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
+    && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
-ENV SHELL /bin/zsh
-ENV ZSH=/home/$USERNAME/.oh-my-zsh
+# Configure ZSH
+COPY --chown=$USERNAME:$USERNAME .zshrc /home/$USERNAME/.zshrc
 
-#RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-RUN ln -s /workspaces/config-tool /home/$USERNAME/config-tool
+WORKDIR /workspace
+
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8000}/ || exit 1

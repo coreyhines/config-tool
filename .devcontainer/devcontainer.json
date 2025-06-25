@@ -2,10 +2,23 @@
   "name": "config-tool dev",
   "context": "..",
   "dockerFile": "Dockerfile",
-  "postCreateCommand": "rm -rf ~/dotfiles; git clone --depth 1 git@github.com:coreyhines/dotfiles.git; cd /tmp; wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && rm -rf ~/.oh-my-zsh; ZSH= sh install.sh --unattended && cd ~/.oh-my-zsh/custom/plugins && git clone https://github.com/zsh-users/zsh-autosuggestions && git clone https://github.com/zsh-users/zsh-syntax-highlighting && if [ -d ~/dotfiles ]; then rm ~/.zshrc; /usr/local/bin/dotbot -c ~/dotfiles/install.conf.yaml; fi",
+  "postCreateCommand": "chmod +x .devcontainer/post-create.sh && .devcontainer/post-create.sh",
+  "init": true,
+  "shutdownAction": "stopContainer",
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb",
+    "storage": "32gb"
+  },
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/${localEnv:USER}/.ssh,type=bind,consistency=cached"
   ],
+  "workspaceMount": {
+    "source": "${localWorkspaceFolder}",
+    "target": "/workspace",
+    "type": "bind",
+    "consistency": "cached"
+  },
   "build": {
     "args": {
       "USER": "${localEnv:USER}",
@@ -22,38 +35,56 @@
     "--security-opt",
     "label=disable",
     "--security-opt",
-    "apparmor=unconfined"
+    "apparmor=unconfined",
+    "--security-opt=no-new-privileges:true"
   ],
   "remoteUser": "${localEnv:USER}",
   "containerUser": "${localEnv:USER}",
   "customizations": {
     "vscode": {
       "settings": {
-        // "remote.containers.dockerPath": "podman-devcontainer-wrapper",
         "python.pythonPath": "/usr/local/bin/python",
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.analysis.typeCheckingMode": "basic",
+        "python.analysis.autoImportCompletions": true,
+        "python.analysis.fixAll": ["ruff"],
+        "python.formatting.provider": "ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll": true,
+          "source.organizeImports": true
+        },
         "python.testing.pytestArgs": ["tests"],
         "python.testing.unittestEnabled": false,
         "python.testing.nosetestsEnabled": false,
         "python.testing.pytestEnabled": true,
-        "python.linting.flake8Enabled": false,
-        "python.formatting.provider": "black",
-        "python.formatting.blackArgs": ["--line-length", "79"],
         "python.linting.enabled": true,
+        "python.linting.flake8Enabled": false,
         "python.linting.pylintEnabled": false,
         "python.linting.banditEnabled": true,
         "python.linting.pycodestyleEnabled": false,
-        "git.detectSubmodulesLimit": 30
+        "git.detectSubmodulesLimit": 30,
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "files.trimFinalNewlines": true
       },
       "extensions": [
         "redhat.vscode-yaml",
         "ms-python.python",
+        "charliermarsh.ruff",
         "github.vscode-pull-request-github",
         "aristapublisher.eos",
         "docsmsft.docs-yaml",
         "ms-python.vscode-pylance",
         "eamodio.gitlens",
-        "gitlab.gitlab-workflow"
+        "gitlab.gitlab-workflow",
+        "ms-azuretools.vscode-docker"
       ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/rust:1": {
+      "version": "latest"
     }
   }
 }
