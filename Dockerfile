@@ -40,21 +40,15 @@ RUN useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
 USER $USERNAME
 WORKDIR /home/$USERNAME
 
-# Install uv and Python packages
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && . ~/.bashrc \
-    && export PATH="/home/$USERNAME/.local/bin:$PATH" \
-    && /home/$USERNAME/.local/bin/uv venv \
-    && . .venv/bin/activate \
-    && /home/$USERNAME/.local/bin/uv pip install --upgrade pip \
-    && /home/$USERNAME/.local/bin/uv pip install \
-        black==24.1.1 \
-        flake8==7.0.0 \
-        pytest==8.0.0 \
-        pytest-cov==4.1.0 \
-        mypy==1.8.0 \
-        pylint==3.0.3 \
-        rope==1.12.0
+# Install Python packages
+RUN pip install --user --no-cache-dir \
+    black==24.1.1 \
+    flake8==7.0.0 \
+    pytest==8.0.0 \
+    pytest-cov==4.1.0 \
+    mypy==1.8.0 \
+    pylint==3.0.3 \
+    rope==1.12.0
 
 # Set up ZSH with Oh My Zsh and plugins
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended \
