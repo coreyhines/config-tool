@@ -8,7 +8,6 @@ image:
     GID: ${DEVPOD_GID}
 
 workspaceFolder: /workspace
-mountWorkspaceSource: true
 
 # Mounts from devcontainer.json
 mounts:
@@ -19,18 +18,13 @@ mounts:
 options:
   cpus: 2
   memory: 4096
-  disk: 32
 
 # Post-create command
 init: chmod +x .devcontainer/post-create.sh && .devcontainer/post-create.sh
 
 # Security options from devcontainer.json
-privileged: false
 securityOpts:
   - no-new-privileges:true
-  - label=disable
-  - apparmor=unconfined
-  - seccomp=unconfined
 
 # Additional capabilities
 capabilities:
