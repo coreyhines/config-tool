@@ -1,24 +1,23 @@
-# Use Python slim image as base
-FROM python:3.12-slim-bookworm as final
+# Use Fedora Python image as base
+FROM registry.fedoraproject.org/python-3.12:latest as final
 
 # Install system packages and cleanup in one layer
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    sudo \
-    vim \
+RUN dnf update -y && dnf install -y \
+    sudo-rs \
+    vim-minimal \
     git \
     zip \
     cloc \
-    bind9-dnsutils \
+    bind-utils \
     zsh \
     zsh-syntax-highlighting \
     less \
     liquidprompt \
-    inetutils-ping \
+    iputils \
     curl \
-    fonts-powerline \
+    powerline-fonts \
     fontconfig \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && dnf clean all
 
 ARG USER
 ARG UID
@@ -32,35 +31,29 @@ ENV USERNAME=$USER \
     PATH="/home/$USER/.local/bin:$PATH" \
     SHELL=/bin/zsh
 
-# Create the user and setup sudo
+# Create the user and setup sudo-rs
 RUN useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-    && chmod 0440 /etc/sudoers.d/$USERNAME
+    && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers-rs.d/$USERNAME \
+    && chmod 0440 /etc/sudoers-rs.d/$USERNAME
+
+# Copy dotfiles
+COPY --chown=$USERNAME:$USERNAME .zshrc /home/$USERNAME/
+
+# Install Python packages
+RUN python -m pip install --no-cache-dir \
+    black==24.2.0 \
+    ruff==0.3.4 \
+    pytest==8.0.2 \
+    pytest-cov==4.1.0 \
+    pre-commit==3.6.2
 
 USER $USERNAME
 WORKDIR /home/$USERNAME
 
-# Install uv and Python packages
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && . ~/.bashrc \
-    && export PATH="/home/$USERNAME/.local/bin:$PATH" \
-    && /home/$USERNAME/.local/bin/uv pip install --upgrade pip \
-    && /home/$USERNAME/.local/bin/uv pip install \
-        black==24.1.1 \
-        flake8==7.0.0 \
-        pytest==8.0.0 \
-        pytest-cov==4.1.0 \
-        mypy==1.8.0 \
-        pylint==3.0.3 \
-        rope==1.12.0
-
 # Set up ZSH with Oh My Zsh and plugins
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended \
-    && git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
-    && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-
-# Configure ZSH
-COPY --chown=$USERNAME:$USERNAME .zshrc /home/$USERNAME/.zshrc
+    && git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
+    && git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
 WORKDIR /workspace
 
