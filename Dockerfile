@@ -40,11 +40,9 @@ RUN useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
 USER $USERNAME
 WORKDIR /home/$USERNAME
 
-# Install uv and Python packages
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && . ~/.bashrc \
-    && /home/$USERNAME/.local/bin/uv pip install --system --upgrade pip \
-    && /home/$USERNAME/.local/bin/uv pip install --system \
+# Install Python packages using pip
+RUN python -m pip install --no-cache-dir --upgrade pip \
+    && python -m pip install --no-cache-dir \
         black==24.1.1 \
         flake8==7.0.0 \
         pytest==8.0.0 \
