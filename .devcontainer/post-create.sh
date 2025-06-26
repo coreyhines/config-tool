@@ -3,18 +3,13 @@ set -e
 
 echo "🚀 Setting up development environment..."
 
-# Install uv
-echo "📦 Installing uv..."
-curl -LsSf https://astral.sh/uv/install.sh | sh
-export PATH="/root/.cargo/bin:$PATH"
-
-# Install Python dependencies with uv
+# Install Python dependencies with pip
 echo "📦 Installing Python dependencies..."
-uv pip install -r requirements.txt
+python -m pip install -r requirements.txt
 
 # Install additional development tools
 echo "🛠 Installing development tools..."
-uv pip install ruff pytest pytest-cov pre-commit
+python -m pip install ruff pytest pytest-cov pre-commit
 
 # Setup pre-commit hooks
 echo "🔧 Setting up pre-commit hooks..."
@@ -99,7 +94,7 @@ source \$ZSH/oh-my-zsh.sh
 # Aliases
 alias ll='ls -la'
 alias py='python3'
-alias uvr='uv pip install -r requirements.txt'
+alias pipr='python -m pip install -r requirements.txt'
 
 # Python development aliases
 alias ruff='ruff check --fix .'
