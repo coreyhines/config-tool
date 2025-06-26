@@ -1,8 +1,10 @@
-# Use Fedora Python image as base
-FROM registry.fedoraproject.org/python-3.12:latest as final
+# Use Fedora base image
+FROM registry.fedoraproject.org/fedora:39 as final
 
 # Install system packages and cleanup in one layer
 RUN dnf update -y && dnf install -y \
+    python3.12 \
+    python3.12-pip \
     sudo-rs \
     vim-minimal \
     git \
@@ -40,7 +42,7 @@ RUN useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
 COPY --chown=$USERNAME:$USERNAME .zshrc /home/$USERNAME/
 
 # Install Python packages
-RUN python -m pip install --no-cache-dir \
+RUN python3.12 -m pip install --no-cache-dir \
     black==24.2.0 \
     ruff==0.3.4 \
     pytest==8.0.2 \
