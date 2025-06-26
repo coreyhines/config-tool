@@ -3,6 +3,11 @@ set -e
 
 echo "🚀 Setting up development environment..."
 
+# Install uv
+echo "📦 Installing uv..."
+curl -LsSf https://astral.sh/uv/install.sh | sh
+export PATH="/root/.cargo/bin:$PATH"
+
 # Install Python dependencies with uv
 echo "📦 Installing Python dependencies..."
 uv pip install -r requirements.txt
