@@ -43,7 +43,6 @@ WORKDIR /home/$USERNAME
 # Install uv and Python packages
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
     && . ~/.bashrc \
-    && export PATH="/home/$USERNAME/.local/bin:$PATH" \
     && /home/$USERNAME/.local/bin/uv pip install --system --upgrade pip \
     && /home/$USERNAME/.local/bin/uv pip install --system \
         black==24.1.1 \
