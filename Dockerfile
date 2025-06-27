@@ -60,7 +60,3 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 COPY --chown=$USERNAME:$USERNAME .zshrc /home/$USERNAME/.zshrc
 
 WORKDIR /workspace
-
-# Add healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8000}/ || exit 1 
