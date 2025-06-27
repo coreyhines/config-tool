@@ -12,14 +12,21 @@ RUN dnf update -y && dnf install -y \
     cloc \
     bind-utils \
     zsh \
-    zsh-syntax-highlighting \
     less \
-    liquidprompt \
     iputils \
     curl \
     powerline-fonts \
     fontconfig \
-    && dnf clean all
+    rust \
+    cargo \
+    openssh-clients \
+    procps-ng \
+    tar \
+    gzip \
+    bash-completion \
+    && dnf clean all \
+    && ln -sf /usr/bin/python3.12 /usr/bin/python \
+    && ln -sf /usr/bin/pip3.12 /usr/bin/pip
 
 ARG USER
 ARG UID
@@ -31,15 +38,26 @@ ENV USERNAME=$USER \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/home/$USER/.local/bin:$PATH" \
-    SHELL=/bin/zsh
+    SHELL=/bin/zsh \
+    CARGO_HOME=/usr/local/cargo \
+    RUSTUP_HOME=/usr/local/rustup \
+    PATH="/usr/local/cargo/bin:$PATH" \
+    LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 
 # Create the user and setup sudo-rs
-RUN useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+RUN mkdir -p /etc/sudoers-rs.d && \
+    useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers-rs.d/$USERNAME \
     && chmod 0440 /etc/sudoers-rs.d/$USERNAME
 
+# Setup SSH directory with proper permissions
+RUN mkdir -p /home/$USERNAME/.ssh \
+    && chown -R $USERNAME:$USER_GID /home/$USERNAME/.ssh \
+    && chmod 700 /home/$USERNAME/.ssh
+
 # Copy dotfiles
-COPY --chown=$USERNAME:$USERNAME .zshrc /home/$USERNAME/
+COPY --chown=$USERNAME:dialout .zshrc /home/$USERNAME/
 
 # Install Python packages
 RUN python3.12 -m pip install --no-cache-dir \
@@ -52,13 +70,7 @@ RUN python3.12 -m pip install --no-cache-dir \
 USER $USERNAME
 WORKDIR /home/$USERNAME
 
-# Set up ZSH with Oh My Zsh and plugins
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended \
-    && git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
-    && git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+# Set up ZSH with Oh My Zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 WORKDIR /workspace
-
-# Add healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8000}/ || exit 1
