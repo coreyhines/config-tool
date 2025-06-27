@@ -31,8 +31,8 @@ class NoVerifyTransport(jsonrpclib.jsonrpc.Transport):
     """Transport that doesn't verify SSL certificates"""
 
     def __init__(self):
-        # Create a config object with required attributes
-        config = type("Config", (), {"version": jsonrpclib.jsonrpc.VERSION_1})()
+        # Create an empty config object
+        config = type("Config", (), {})()
         super().__init__(config)
 
     def single_request(self, host, handler, request_body, verbose=0):
