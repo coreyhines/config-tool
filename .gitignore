@@ -5,3 +5,4 @@ configs/
 dotfiles/
 hosts.txt
 target/
+.venv/

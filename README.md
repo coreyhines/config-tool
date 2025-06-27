@@ -16,7 +16,7 @@ A powerful toolkit for analyzing and managing Arista EOS device configurations a
 
 - Python 3.12+ for Python implementation
 - Rust toolchain (optional) for high-performance implementation
-- Valid EOS device credentials
+- Valid EOS device credentials with eAPI access enabled
 - One of:
   - VS Code with Dev Containers extension
   - DevPod
@@ -41,7 +41,10 @@ A powerful toolkit for analyzing and managing Arista EOS device configurations a
    devpod up
 
    # Option 3: Local Installation
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install -r requirements.txt
+   pre-commit install
    ```
 
 For detailed setup instructions, see the [Build Guide](./docs/BUILD.md).
@@ -55,15 +58,17 @@ Analyze configuration patterns across multiple EOS devices:
 ```bash
 ./config-tool.py --directory /path/to/configs \
                  --mask description \
-                 --count all
+                 --count 3 \
+                 --absolute common
 ```
 
 Options:
 - `--directory PATH`: Location of EOS configuration files
 - `--mask STRING`: Ignore specific elements during comparison (e.g., descriptions)
-- `--count #|all`: Threshold for considering a stanza "common"
-  - Number: Minimum occurrences required
-  - `all`: Must appear in every config file
+- `--count #`: Threshold for considering a stanza "common" (default: 3)
+- `--absolute`: Specify output type
+  - `common`: Show only stanzas present in all configs
+  - `specific`: Show unique stanzas
 
 ### Configuration Collection (confgrabber)
 
@@ -72,8 +77,10 @@ Pull configurations from live EOS devices:
 ```bash
 ./confgrabber.py --user admin \
                  --passwd 'secret' \
-                 --file switches \
-                 --directory ./configs/
+                 --file switches.txt \
+                 --directory ./configs/ \
+                 --sanitized \
+                 --workers 10
 ```
 
 Options:
@@ -81,6 +88,31 @@ Options:
 - `--passwd STRING`: EOS device password
 - `--file PATH`: File containing list of switch hostnames/IPs
 - `--directory PATH`: Output directory for configurations
+- `--sanitized`: Get sanitized configs (removes sensitive data)
+- `--workers N`: Maximum number of parallel workers (default: CPU count)
+
+### Development Setup
+
+The project includes a complete development environment with:
+
+1. **Code Quality Tools**:
+   - Black for code formatting
+   - Ruff for linting and import sorting
+   - Pre-commit hooks for consistent code quality
+
+2. **Testing**:
+   - pytest for unit testing
+   - pytest-cov for coverage reporting
+
+3. **Container Support**:
+   - VS Code devcontainer configuration
+   - DevPod support
+   - Fedora-based development environment
+
+4. **Dependencies**:
+   - Core: jsonrpclib-pelix, ping3
+   - Development: black, ruff, pytest, pre-commit
+   - All versions pinned for reproducibility
 
 ## ⚡ Performance Optimization
 
@@ -93,7 +125,7 @@ Choose based on your needs:
 | Setup Complexity | Simple | Requires compilation |
 | Memory Usage | Higher | Lower |
 | Processing Speed | Good | Excellent |
-| Parallel Processing | Limited | Full support |
+| Parallel Processing | ThreadPoolExecutor | Full concurrency |
 | Best For | Development, small deployments | Production, large scale |
 
 See [RUST_USAGE.md](./RUST_USAGE.md) for Rust-specific features and usage.
@@ -102,24 +134,27 @@ See [RUST_USAGE.md](./RUST_USAGE.md) for Rust-specific features and usage.
 
 - Credentials are never stored in configuration files
 - Support for environment variables for sensitive data
-- Secure eAPI communication
-- Optional read-only mode
+- Secure eAPI communication over HTTPS
+- Optional sanitized config collection
+- SSL verification (can be disabled if needed)
+- Exponential backoff for failed attempts
 
 ## 🛠 Development
 
 ### Development Environments
 
 1. **VS Code Devcontainer**:
-   - Full IDE integration
-   - Pre-configured Python environment
-   - Optional Rust toolchain
-   - Extension recommendations
+   - Python 3.12 environment
+   - Pre-configured linting and formatting
+   - Rust toolchain (optional)
+   - Git integration
+   - Debugging support
 
 2. **DevPod**:
-   - More stable container management
-   - Better Podman support
-   - Faster startup times
+   - Podman support
+   - Consistent environment
    - IDE-agnostic
+   - Faster container startup
 
 See [Build Guide](./docs/BUILD.md) for detailed development setup instructions.
 
@@ -133,7 +168,7 @@ See [Build Guide](./docs/BUILD.md) for detailed development setup instructions.
 ## 🤝 Contributing
 
 Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) for details on:
-- Code style
+- Code style (Black + Ruff)
 - Development process
 - Testing requirements
 - Pull request process
