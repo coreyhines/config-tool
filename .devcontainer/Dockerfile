@@ -1,24 +1,32 @@
-# Use Python slim image as base
-FROM python:3.12-slim-bookworm as final
+# Use Fedora base image
+FROM registry.fedoraproject.org/fedora:39 as final
 
 # Install system packages and cleanup in one layer
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    sudo \
-    vim \
+RUN dnf update -y && dnf install -y \
+    python3.12 \
+    python3.12-pip \
+    sudo-rs \
+    vim-minimal \
     git \
     zip \
     cloc \
-    bind9-dnsutils \
+    bind-utils \
     zsh \
-    zsh-syntax-highlighting \
     less \
-    liquidprompt \
-    inetutils-ping \
+    iputils \
     curl \
-    fonts-powerline \
+    powerline-fonts \
     fontconfig \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    rust \
+    cargo \
+    openssh-clients \
+    procps-ng \
+    tar \
+    gzip \
+    bash-completion \
+    && dnf clean all \
+    && ln -sf /usr/bin/python3.12 /usr/bin/python \
+    && ln -sf /usr/bin/pip3.12 /usr/bin/pip
 
 ARG USER
 ARG UID
@@ -30,40 +38,39 @@ ENV USERNAME=$USER \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/home/$USER/.local/bin:$PATH" \
-    SHELL=/bin/zsh
+    SHELL=/bin/zsh \
+    CARGO_HOME=/usr/local/cargo \
+    RUSTUP_HOME=/usr/local/rustup \
+    PATH="/usr/local/cargo/bin:$PATH" \
+    LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 
-# Create the user and setup sudo
-RUN useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-    && chmod 0440 /etc/sudoers.d/$USERNAME
+# Create the user and setup sudo-rs
+RUN mkdir -p /etc/sudoers-rs.d && \
+    useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers-rs.d/$USERNAME \
+    && chmod 0440 /etc/sudoers-rs.d/$USERNAME
+
+# Setup SSH directory with proper permissions
+RUN mkdir -p /home/$USERNAME/.ssh \
+    && chown -R $USERNAME:$USER_GID /home/$USERNAME/.ssh \
+    && chmod 700 /home/$USERNAME/.ssh
+
+# Copy dotfiles
+COPY --chown=$USERNAME:dialout .zshrc /home/$USERNAME/
+
+# Install Python packages
+RUN python3.12 -m pip install --no-cache-dir \
+    black==24.2.0 \
+    ruff==0.3.4 \
+    pytest==8.0.2 \
+    pytest-cov==4.1.0 \
+    pre-commit==3.6.2
 
 USER $USERNAME
 WORKDIR /home/$USERNAME
 
-# Install uv and Python packages
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && . ~/.bashrc \
-    && export PATH="/home/$USERNAME/.local/bin:$PATH" \
-    && /home/$USERNAME/.local/bin/uv pip install --upgrade pip \
-    && /home/$USERNAME/.local/bin/uv pip install \
-        black==24.1.1 \
-        flake8==7.0.0 \
-        pytest==8.0.0 \
-        pytest-cov==4.1.0 \
-        mypy==1.8.0 \
-        pylint==3.0.3 \
-        rope==1.12.0
-
-# Set up ZSH with Oh My Zsh and plugins
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended \
-    && git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
-    && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-
-# Configure ZSH
-COPY --chown=$USERNAME:$USERNAME .zshrc /home/$USERNAME/.zshrc
+# Set up ZSH with Oh My Zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 WORKDIR /workspace
-
-# Add healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8000}/ || exit 1

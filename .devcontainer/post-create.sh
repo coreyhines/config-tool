@@ -3,13 +3,13 @@ set -e
 
 echo "🚀 Setting up development environment..."
 
-# Install Python dependencies with uv
+# Install Python dependencies with pip
 echo "📦 Installing Python dependencies..."
-uv pip install -r requirements.txt
+python -m pip install -r requirements.txt
 
 # Install additional development tools
 echo "🛠 Installing development tools..."
-uv pip install ruff pytest pytest-cov pre-commit
+python -m pip install ruff pytest pytest-cov pre-commit
 
 # Setup pre-commit hooks
 echo "🔧 Setting up pre-commit hooks..."
@@ -57,12 +57,24 @@ if [ -d "$HOME/dotfiles" ]; then
     rm -rf "$HOME/dotfiles"
 fi
 
-# Clone and setup dotfiles
+# Clone dotfiles
 git clone --depth 1 git@github.com:coreyhines/dotfiles.git "$HOME/dotfiles"
+
+# Backup existing .zshrc if it exists
 if [ -f "$HOME/.zshrc" ]; then
-    rm "$HOME/.zshrc"
+    mv "$HOME/.zshrc" "$HOME/.zshrc.backup"
 fi
-/usr/local/bin/dotbot -c "$HOME/dotfiles/install.conf.yaml"
+
+# Create symlinks for dotfiles
+for file in "$HOME/dotfiles"/*; do
+    if [ -f "$file" ]; then
+        filename=$(basename "$file")
+        # Skip the install.conf.yaml and README files
+        if [[ "$filename" != "install.conf.yaml" && "$filename" != "README.md" ]]; then
+            ln -sf "$file" "$HOME/.$filename"
+        fi
+    fi
+done
 
 # Create custom zsh configuration
 echo "⚙️ Configuring Zsh..."
@@ -94,7 +106,7 @@ source \$ZSH/oh-my-zsh.sh
 # Aliases
 alias ll='ls -la'
 alias py='python3'
-alias uvr='uv pip install -r requirements.txt'
+alias pipr='python -m pip install -r requirements.txt'
 
 # Python development aliases
 alias ruff='ruff check --fix .'
@@ -121,4 +133,4 @@ cat > "$HOME/.vscode-server/data/Machine/settings.json" <<EOL
 }
 EOL
 
-echo "✅ Development environment setup complete!" 
+echo "✅ Development environment setup complete!"
