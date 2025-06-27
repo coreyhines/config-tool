@@ -30,6 +30,11 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 class NoVerifyTransport(jsonrpclib.jsonrpc.Transport):
     """Transport that doesn't verify SSL certificates"""
 
+    def __init__(self):
+        # Create a config object with required attributes
+        config = type("Config", (), {"version": jsonrpclib.jsonrpc.VERSION_1})()
+        super().__init__(config)
+
     def single_request(self, host, handler, request_body, verbose=0):
         # Create an SSL context that doesn't verify certificates
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
