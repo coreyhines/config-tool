@@ -39,11 +39,11 @@ This tool can be used to help create configlets for
 CloudVision Portal
 """
 
-import pathlib
-from collections import Counter
-import re
 import argparse
 import os
+import pathlib
+import re
+from collections import Counter
 from os.path import expanduser
 
 
@@ -62,28 +62,29 @@ def search_comments(line):
 
 
 def fix_ups(line):
-    """ fix any issues with the stanzas
+    """fix any issues with the stanzas
     Example these lines will appear as one stanza:
 
        hostname superswitch101
        ip name-server vrf mgmt foo.com
        ip name-server vrf mgmt foo2.com
-       dns domain bar.com 
-    
-    If hostname is separated, the following 3 
-    lines are likely to be shared among some or 
+       dns domain bar.com
+
+    If hostname is separated, the following 3
+    lines are likely to be shared among some or
     all of the configs
 
        hostname superswitch101
        !
        ip name-server vrf mgmt foo.com
        ip name-server vrf mgmt foo2.com
-       dns domain bar.com 
-    """   
+       dns domain bar.com
+    """
     regex_match = re.compile(r"^(hostname.*)", re.M)
     re_match = re.sub(regex_match, r"\1\n!", line)
     return str(re_match)
-       
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -92,9 +93,9 @@ def main():
         type=str,
         default="common",
         choices=[
-             "common",
-             "specific",
-         ],
+            "common",
+            "specific",
+        ],
         help="specify an absolute config output type",
         required=False,
     )
@@ -136,13 +137,7 @@ def main():
         mydir = home + "/vs-code/config-tool/configs/"
 
     num_files = str(
-        len(
-            [
-                name
-                for name in os.listdir(mydir)
-                if os.path.isfile(mydir + "/" + name)
-            ]
-        )
+        len([name for name in os.listdir(mydir) if os.path.isfile(mydir + "/" + name)])
     )
 
     if args.absolute == "common":
@@ -151,6 +146,11 @@ def main():
     elif args.absolute == "specific":
         maxcount = 1
     else:
+        mincount = args.count
+        maxcount = args.count
+
+    # Override with count if explicitly provided
+    if args.count != 3:  # 3 is the default, so if it's not 3, user specified -c
         mincount = args.count
         maxcount = args.count
 
@@ -163,7 +163,6 @@ def main():
     regex_sub_comments = re.compile(r"(^\s+)#(.*)", re.M)
     regex_sub_rancid = re.compile(r"RANCID-CONTENT-TYPE:\sarista", re.IGNORECASE)
 
-
     for path in pathlib.Path(mydir).iterdir():
         if path.is_file():
             current_file = open(path, "r")
@@ -174,7 +173,7 @@ def main():
             subcontent = re.sub(regex_sub_rancid, "", subcontent)
             subcontent = re.sub(regex_sub_command, "", subcontent)
             # change any '!' with preceding whitespace to a '#'
-            # change any '!' at the end of a word to a '#' 
+            # change any '!' at the end of a word to a '#'
             # We will change those back at the end
             subcontent = re.sub(regex_sub_bang, r"\1#\2", subcontent)
             subcontent = re.sub(regex_sub_endbang, r"\1#", subcontent)
@@ -198,23 +197,23 @@ def main():
     """
     if int(maxcount) > 1:
         for k, v in sorted(Counter(stanzas).items()):
-            #print(f"v is: {v} and k is {k}")
+            # print(f"v is: {v} and k is {k}")
             if v >= int(mincount) and v <= int(num_files):
                 # substitute the '  !' back in for the '#'
                 # used to trick the split parser earlier
-                #print(f"K is: ->{k}<-")
+                # print(f"K is: ->{k}<-")
                 if k and not str.isspace(k):
-                  print(
-                      f'\n\n\n\n\n\x1b[6;30;44m ↓ SEEN ->({str(v)}/{num_files})<- TIMES ↓\x1b[0m'
-                  )
-                  # gah this is hacky stuff to get the "!" in correctly
-                  if not re.match("\n#", k):
+                    print(
+                        f"\n\n\n\n\n\x1b[6;30;44m ↓ SEEN ->({str(v)}/{num_files})<- TIMES ↓\x1b[0m"
+                    )
+                    # gah this is hacky stuff to get the "!" in correctly
+                    if not re.match("\n#", k):
+                        print("!")
+                    print(re.sub(regex_sub_comments, r"\1!\2", k).strip())
                     print("!")
-                  print(re.sub(regex_sub_comments, r"\1!\2", k).strip())
-                  print("!")
-                  print(
-                      f'\x1b[6;30;44m ↑ SEEN ->({str(v)}/{num_files})<- TIMES ↑\x1b[0m'
-                  )
+                    print(
+                        f"\x1b[6;30;44m ↑ SEEN ->({str(v)}/{num_files})<- TIMES ↑\x1b[0m"
+                    )
     else:
         for k, v in sorted(Counter(stanzas).items()):
             if v > int(maxcount):
@@ -231,15 +230,14 @@ def main():
                     _con.append(_stanza)
             if _con:
                 print(
-                    f'\n\n\n\n\n\x1b[6;30;44m ↓ Device Specific Config for: {device} ↓\x1b[0m'
+                    f"\n\n\n\n\n\x1b[6;30;44m ↓ Device Specific Config for: {device} ↓\x1b[0m"
                 )
                 print(re.sub(regex_sub_comments, r"\1!\2", "".join(_con).strip()))
                 print(
-                    f'!\n\x1b[6;30;44m ↑ Device Specific Config for: {device} ↑\x1b[0m'
+                    f"!\n\x1b[6;30;44m ↑ Device Specific Config for: {device} ↑\x1b[0m"
                 )
 
     # Coments list for review
-
 
     # Coments list for review
     # print(len(comments))
